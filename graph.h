@@ -15,6 +15,10 @@ class Graph {
 
         Graph();
 
+        void findPath(int start, int end);
+        void printGraph();    
+    
+
 
 };
 
