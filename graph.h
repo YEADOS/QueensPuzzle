@@ -10,14 +10,18 @@
 class Graph {
     private:
         std::vector<std::vector<int>> puzzle;
+        std::vector<std::vector<int>> puzzleBackup;
 
     public: 
 
         Graph();
 
-        void findPath(int start, int end);
+        void processColours();
+        bool isValid(int row, int col);
+        bool solvePuzzle(int start, int end);
         void printGraph();    
-    
+        std::vector<std::vector<int>> getGraph();
+        int getSize();
 
 
 };
