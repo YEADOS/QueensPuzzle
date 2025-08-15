@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "../include/graph.h"
 
 // Queen is represented by 0
 // Non-queen spot represented by -1
