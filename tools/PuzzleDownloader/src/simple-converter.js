@@ -90,12 +90,6 @@ function convertLocalLevels(levelsDirectory) {
     console.log(`Found ${files.length} level files`);
     
     let output = [];
-    output.push("# Queens Game Puzzles");
-    output.push("# Converted from TypeScript format to numbered regions");
-    output.push("# Format: size, then grid with numbers representing color regions");
-    output.push("");
-    output.push(`${files.length}`);
-    output.push("");
     
     let successCount = 0;
     
@@ -119,14 +113,12 @@ function convertLocalLevels(levelsDirectory) {
             // levelName.slice(0,-1);
             const numberGrid = convertToNumbers(level.colorRegions, level.regionColors);
             
-            output.push(`# ${levelName} ${levelNumber}`);
             output.push(`${level.size}`);
             
             numberGrid.forEach(row => {
                 output.push(row.join(" "));
             });
             
-            output.push("");
             
             // Add color mapping as comments for reference
             // output.push("# Color mapping:");

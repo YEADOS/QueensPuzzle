@@ -8,17 +8,28 @@ BIN_DIR = bin
 
 TARGET = $(BIN_DIR)/main.out
 
-$(TARGET): graph.o
-	$(CC) $(CPPFLAGS) $^ -o $@
+# $(TARGET): graph.o
+# 	$(CC) $(CPPFLAGS) $^ -o $@
 
 # Only compile the .cpp, not the .h
-graph.o: $(SRC_DIR)/graph.cpp $(INC_DIR)/graph.h
-	$(CC) $(CPPFLAGS) -c $< -o $@ 
+# Define object files
+OBJS = graph.o main.o PuzzleManager.o
+
+$(TARGET): $(OBJS)
+	$(CC) $(CPPFLAGS) $^ -o $@
+
+# Pattern rule for object files
+%.o: $(SRC_DIR)/%.cpp $(INC_DIR)/%.h
+	$(CC) $(CPPFLAGS) -c $< -o $@
+
+# Special case for main.cpp if it doesn't have a header
+main.o: $(SRC_DIR)/main.cpp
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 	
 clean:
-	rm -f graph.o $(TARGET)
+	rm -f *.o $(TARGET)
 
 .PHONY: clean

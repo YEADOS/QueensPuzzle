@@ -3,6 +3,7 @@
 // Queen is represented by 0
 // Non-queen spot represented by -1
 
+// Default Constructor
 Graph::Graph() {
     // puzzle = {
     //     {1, 2, 2, 2, 2, 2, 2, 2, 2},
@@ -28,24 +29,28 @@ Graph::Graph() {
 
     // 30/4/2025 LinkedIn Queens Game
 
-    puzzle = {
-        {1, 2, 2, 2, 2, 2, 2},
-        {1, 1, 1, 1, 3, 3, 2},
-        {1, 1, 4, 5, 5, 3, 2},
-        {1, 6, 4, 4, 5, 2, 2},
-        {1, 6, 6, 4, 4, 2, 2},
-        {7, 7, 6, 6, 2, 2, 2},
-        {7, 7, 2, 2, 2, 2, 2}
-    };
-    puzzleBackup = puzzle;
+    // puzzle = {
+    //     {1, 2, 2, 2, 2, 2, 2},
+    //     {1, 1, 1, 1, 3, 3, 2},
+    //     {1, 1, 4, 5, 5, 3, 2},
+    //     {1, 6, 4, 4, 5, 2, 2},
+    //     {1, 6, 6, 4, 4, 2, 2},
+    //     {7, 7, 6, 6, 2, 2, 2},
+    //     {7, 7, 2, 2, 2, 2, 2}
+    // };
+    // puzzleBackup = puzzle;
 }
 
+// Constructor
+Graph::Graph(const std::vector<std::vector<int>>& data) {
+    puzzle = data;
+    puzzleBackup = data;
+}
 
 bool Graph::isValid(int row, int col) {
 
     int n = puzzle.size();
     // Queen = 0
-
     int currentColour = puzzle[row][col];
 
     // Check to see if the queen is in the same column
@@ -68,15 +73,13 @@ bool Graph::isValid(int row, int col) {
                 return false;
         }
     }
-    
     return true;
 
 
 }
 
 bool Graph::solvePuzzle(int row, int n) {
-
-
+  
     if (row == n) {
         // All queens placed, print solution
         for (int i = 0; i < n; ++i) {
@@ -107,24 +110,22 @@ bool Graph::solvePuzzle(int row, int n) {
     return false;
 }
 
-std::vector<std::vector<int>> Graph::getGraph() {
+const std::vector<std::vector<int>> Graph::getGraph() {
     return puzzle;
 }
 
 
-int Graph::getSize() {
+const int Graph::getSize() {
     return puzzle.size();
 }
 
-int main() {
-
-    Graph g;
-
-    
-    if (!g.solvePuzzle(0, g.getSize())) {
-        std::cout << "No solution found.\n";
+const void Graph::printGraph() {
+    int n = getSize();
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            std::cout << puzzle[i][j] << " ";
+        }
+        std::cout << '\n';
     }
-
-    return 0;
-
+    std::cout << "---------------------\n";
 }

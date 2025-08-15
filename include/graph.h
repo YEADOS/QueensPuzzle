@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <fstream>
 
 
 class Graph {
@@ -15,15 +16,14 @@ class Graph {
     public: 
 
         Graph();
+        Graph(const std::vector<std::vector<int>>& data);
 
         void processColours();
         bool isValid(int row, int col);
         bool solvePuzzle(int start, int end);
-        void printGraph();    
-        std::vector<std::vector<int>> getGraph();
-        int getSize();
-
-
+        const void printGraph();    
+        const std::vector<std::vector<int>> getGraph();
+        const int getSize();
 };
 
 #endif
