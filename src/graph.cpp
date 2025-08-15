@@ -125,6 +125,6 @@ int main() {
         std::cout << "No solution found.\n";
     }
 
-    return 1;
+    return 0;
 
 }
