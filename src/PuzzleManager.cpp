@@ -2,13 +2,13 @@
 #include <fstream>
 #include <iostream>
 
-std::vector<Graph> PuzzleManager::loadFromFile(const std::string& filename, int numPuzzles) {
-    std::vector<Graph> graphs;
+void PuzzleManager::loadFromFile(const std::string& filename, int numPuzzles, std::vector<Graph> &graphs) {
+    // std::vector<Graph> graphs;
     std::ifstream puzzleFile(filename);
 
     if (!puzzleFile.is_open()) {
         std::cerr << "Unable to open file: " << filename << std::endl;
-        return graphs;
+        // return graphs;
     }
 
     for (int i = 0; i < numPuzzles; i++) {
@@ -27,5 +27,5 @@ std::vector<Graph> PuzzleManager::loadFromFile(const std::string& filename, int 
         graphs.push_back(newGraph);
     }
     puzzleFile.close();
-    return graphs;
+    // return graphs;
 }

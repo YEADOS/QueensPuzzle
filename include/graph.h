@@ -22,7 +22,7 @@ class Graph {
 
     private:
         const std::vector<std::vector<int>> original;
-        const std::vector<std::vector<int>> masked;
+        std::vector<std::vector<int>> masked;
         std::vector<std::vector<int>> currentState;
 
         std::vector<std::vector<int>> createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob);
@@ -35,7 +35,7 @@ class Graph {
         // const void printGraph();    
         void printGraph(PrintMode mode = ORIGINAL) const;
         const std::vector<std::vector<int>> &getOriginal();
-        const std::vector<std::vector<int>> &getMasked();
+        std::vector<std::vector<int>> &getMasked();
         std::vector<std::vector<int>> &getCurrentState();
         int getSize() const;
 };

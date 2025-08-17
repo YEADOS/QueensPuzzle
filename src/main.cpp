@@ -5,14 +5,17 @@
 
 int main() {
 
-    int numPuzzles = 10;
+    int numPuzzles = 1;
     std::string puzzleFileName = "puzzles.txt";
-
-    std::vector<Graph> Graphs = PuzzleManager::loadFromFile(puzzleFileName, numPuzzles);
-    for (auto &g : Graphs) {
+    std::vector<Graph> graphs;
+    // std::vector<Graph> Graphs; = PuzzleManager::loadFromFile(puzzleFileName, numPuzzles);
+    PuzzleManager::loadFromFile(puzzleFileName, numPuzzles, graphs);
+    for (auto &g : graphs) {
 
 
         PuzzleSolver solver(g);
+        g.printGraph(g.ORIGINAL);
+        g.printGraph(g.MASKED);
 
         if (!solver.solvePuzzle(0, g.getSize())) {
             std::cout << "No solution found.\n";
@@ -21,6 +24,7 @@ int main() {
             
             std::cout << "Solution found.\n";
         }
+        solver.printStatistics();
 
 
         // if (!g.solvePuzzle(0, g.getSize())) {

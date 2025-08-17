@@ -43,13 +43,13 @@ Graph::Graph() {
 
 // Constructor
 Graph::Graph(const std::vector<std::vector<int>>& data) 
-    : original(data), currentState(data), masked(createMaskedMatrix(data, 0.1)) {}
+    : original(data), currentState(data), masked(createMaskedMatrix(data, 0.6)) {}
 
 const std::vector<std::vector<int>>& Graph::getOriginal() {
     return original;
 }
 
-const std::vector<std::vector<int>>& Graph::getMasked() {
+std::vector<std::vector<int>>& Graph::getMasked() {
     return masked;
 }
 
