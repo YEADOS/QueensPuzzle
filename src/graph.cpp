@@ -58,20 +58,62 @@ std::vector<std::vector<int>>& Graph::getCurrentState() {
 }
 
 
-const int Graph::getSize() {
+int Graph::getSize() const {
     return original.size();
 }
 
-const void Graph::printGraph() {
+void Graph::printGraph(PrintMode mode) const {
+
+    const std::vector<std::vector<int>>* puzzleType = nullptr;
+    
+    switch (mode) {
+        case ORIGINAL:
+            puzzleType = &original;
+            break;
+        case MASKED:
+            puzzleType = &masked;
+            break;
+        case CURRENT_RAW:
+        case CURRENT_SYMBOLS:
+            puzzleType = &currentState;
+            break;
+    }
+    
+    if (!puzzleType || puzzleType->empty()) {
+        std::cout << "Empty matrix" << std::endl;
+        return;
+    }
+    
     int n = getSize();
+    
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            std::cout << original[i][j] << " ";
+            int value = (*puzzleType)[i][j];
+            
+            if (mode == CURRENT_SYMBOLS) {
+                if (value == 0)
+                    std::cout << "Q ";
+                else
+                    std::cout << ". ";
+            } else {
+                std::cout << value << " ";
+            }
         }
         std::cout << '\n';
     }
     std::cout << "---------------------\n";
 }
+
+// const void Graph::printGraph() {
+//     int n = getSize();
+//     for (int i = 0; i < n; ++i) {
+//         for (int j = 0; j < n; ++j) {
+//             std::cout << original[i][j] << " ";
+//         }
+//         std::cout << '\n';
+//     }
+//     std::cout << "---------------------\n";
+// }
 
 std::vector<std::vector<int>> Graph::createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob) {
     std::vector<std::vector<int>> masked = original;

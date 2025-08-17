@@ -11,6 +11,15 @@
 
 
 class Graph {
+
+    public: 
+        enum PrintMode {
+            ORIGINAL,
+            MASKED,
+            CURRENT_RAW,      // Print current state as numbers
+            CURRENT_SYMBOLS   // Print current state as Q/. symbols
+        };
+
     private:
         const std::vector<std::vector<int>> original;
         const std::vector<std::vector<int>> masked;
@@ -23,11 +32,12 @@ class Graph {
         Graph();
         Graph(const std::vector<std::vector<int>>& data);
 
-        const void printGraph();    
+        // const void printGraph();    
+        void printGraph(PrintMode mode = ORIGINAL) const;
         const std::vector<std::vector<int>> &getOriginal();
         const std::vector<std::vector<int>> &getMasked();
         std::vector<std::vector<int>> &getCurrentState();
-        const int getSize();
+        int getSize() const;
 };
 
 #endif
