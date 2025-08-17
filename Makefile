@@ -13,7 +13,7 @@ TARGET = $(BIN_DIR)/main.out
 
 # Only compile the .cpp, not the .h
 # Define object files
-OBJS = graph.o main.o PuzzleManager.o
+OBJS = graph.o main.o PuzzleManager.o PuzzleSolver.o  
 
 $(TARGET): $(OBJS)
 	$(CC) $(CPPFLAGS) $^ -o $@
@@ -33,3 +33,4 @@ clean:
 	rm -f *.o $(TARGET)
 
 .PHONY: clean
+

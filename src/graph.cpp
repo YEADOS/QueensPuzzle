@@ -42,90 +42,49 @@ Graph::Graph() {
 }
 
 // Constructor
-Graph::Graph(const std::vector<std::vector<int>>& data) {
-    puzzle = data;
-    puzzleBackup = data;
+Graph::Graph(const std::vector<std::vector<int>>& data) 
+    : original(data), currentState(data), masked(createMaskedMatrix(data, 0.1)) {}
+
+const std::vector<std::vector<int>>& Graph::getOriginal() {
+    return original;
 }
 
-bool Graph::isValid(int row, int col) {
-
-    int n = puzzle.size();
-    // Queen = 0
-    int currentColour = puzzle[row][col];
-
-    // Check to see if the queen is in the same column
-    for (int i = 0; i < row; i++) {
-        if (puzzle[i][col] == 0) {
-            return false;
-        }
-    }
-    
-    if (row > 0 && col > 0 && puzzle[row - 1][col - 1] == 0)
-        return false;
-
-    // Check diagonally adjacent (upper-right)
-    if (row > 0 && col < n - 1 && puzzle[row - 1][col + 1] == 0)
-        return false;
-
-    for (int i = 0; i < row; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if (puzzle[i][j] == 0 && puzzleBackup[i][j] == currentColour)
-                return false;
-        }
-    }
-    return true;
-
-
+const std::vector<std::vector<int>>& Graph::getMasked() {
+    return masked;
 }
 
-bool Graph::solvePuzzle(int row, int n) {
-  
-    if (row == n) {
-        // All queens placed, print solution
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < n; ++j) {
-                if (puzzle[i][j] == 0)
-                    std::cout << "Q ";
-                else
-                    std::cout << ". ";
-            }
-            std::cout << std::endl;
-        }
-        std::cout << "---------------------\n";
-        return true; // Set to false if you want all solutions
-    }
-
-    for (int col = 0; col < n; ++col) {
-        if (isValid(row, col)) {
-            int originalColor = puzzle[row][col];
-            puzzle[row][col] = 0;  // Place queen
-
-            if (solvePuzzle(row + 1, n))
-                return true; // Change to continue if you want all solutions
-
-            puzzle[row][col] = originalColor; // Backtrack
-        }
-    }
-
-    return false;
-}
-
-const std::vector<std::vector<int>> Graph::getGraph() {
-    return puzzle;
+std::vector<std::vector<int>>& Graph::getCurrentState() {
+    return currentState;
 }
 
 
 const int Graph::getSize() {
-    return puzzle.size();
+    return original.size();
 }
 
 const void Graph::printGraph() {
     int n = getSize();
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            std::cout << puzzle[i][j] << " ";
+            std::cout << original[i][j] << " ";
         }
         std::cout << '\n';
     }
     std::cout << "---------------------\n";
+}
+
+std::vector<std::vector<int>> Graph::createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob) {
+    std::vector<std::vector<int>> masked = original;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::bernoulli_distribution mask(mask_prob);
+
+    for (size_t i = 0; i < masked.size(); ++i) {
+        for (size_t j = 0; j < masked[i].size(); ++j) {
+            if (mask(gen)) {
+                masked[i][j] = -1;
+            }
+        }
+    }
+    return masked;
 }

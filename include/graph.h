@@ -1,28 +1,32 @@
 #ifndef GRAPH_H
-#define GRAPHS_H 
+#define GRAPH_H 
 
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <random>
+#include <iostream>
 
 
 class Graph {
     private:
-        std::vector<std::vector<int>> puzzle;
-        std::vector<std::vector<int>> puzzleBackup;
+        const std::vector<std::vector<int>> original;
+        const std::vector<std::vector<int>> masked;
+        std::vector<std::vector<int>> currentState;
 
+        std::vector<std::vector<int>> createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob);
+        
     public: 
 
         Graph();
         Graph(const std::vector<std::vector<int>>& data);
 
-        void processColours();
-        bool isValid(int row, int col);
-        bool solvePuzzle(int start, int end);
         const void printGraph();    
-        const std::vector<std::vector<int>> getGraph();
+        const std::vector<std::vector<int>> &getOriginal();
+        const std::vector<std::vector<int>> &getMasked();
+        std::vector<std::vector<int>> &getCurrentState();
         const int getSize();
 };
 

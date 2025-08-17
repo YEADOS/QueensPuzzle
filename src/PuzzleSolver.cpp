@@ -1,0 +1,66 @@
+#include "../include/PuzzleSolver.h"
+
+PuzzleSolver::PuzzleSolver(Graph &graph) : puzzle(graph) {}
+
+bool PuzzleSolver::isValid(int row, int col) {
+
+    int n = puzzle.getOriginal().size();
+    // Queen = 0
+    int currentColour = puzzle.getCurrentState()[row][col];
+
+    // Check to see if the queen is in the same column
+    for (int i = 0; i < row; i++) {
+        if (puzzle.getCurrentState()[i][col] == 0) {
+            return false;
+        }
+    }
+    
+    if (row > 0 && col > 0 && puzzle.getCurrentState()[row - 1][col - 1] == 0)
+        return false;
+
+    // Check diagonally adjacent (upper-right)
+    if (row > 0 && col < n - 1 && puzzle.getCurrentState()[row - 1][col + 1] == 0)
+        return false;
+
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (puzzle.getCurrentState()[i][j] == 0 && puzzle.getOriginal()[i][j] == currentColour)
+                return false;
+        }
+    }
+    return true;
+
+
+}
+
+bool PuzzleSolver::solvePuzzle(int row, int n) {
+  
+    if (row == n) {
+        // All queens placed, print solution
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (puzzle.getCurrentState()[i][j] == 0)
+                    std::cout << "Q ";
+                else
+                    std::cout << ". ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "---------------------\n";
+        return true; // Set to false if you want all solutions
+    }
+
+    for (int col = 0; col < n; ++col) {
+        if (isValid(row, col)) {
+            int originalColor = puzzle.getOriginal()[row][col];
+            puzzle.getCurrentState()[row][col] = 0;  // Place queen
+
+            if (solvePuzzle(row + 1, n))
+                return true; // Change to continue if you want all solutions
+
+            puzzle.getCurrentState()[row][col] = originalColor; // Backtrack
+        }
+    }
+
+    return false;
+}
