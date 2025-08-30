@@ -14,17 +14,24 @@ int main() {
 
 
         PuzzleSolver solver(g);
-        g.printGraph(g.ORIGINAL);
+        // g.printGraph(g.ORIGINAL);
+        // Initial masked
         g.printGraph(g.MASKED);
 
         if (!solver.solvePuzzle(0, g.getSize())) {
             std::cout << "No solution found.\n";
         }
         else {
-            
+            std::cout << "Original.\n";
+            g.printGraph(g.ORIGINAL);
+            std::cout << "Current.\n";
+            g.printGraph(g.CURRENT_SYMBOLS);
+            std::cout << "Finished Masked.\n";
+            g.printGraph(g.MASKED);
             std::cout << "Solution found.\n";
         }
         solver.printStatistics();
+        
 
 
         // if (!g.solvePuzzle(0, g.getSize())) {
