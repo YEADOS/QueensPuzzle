@@ -5,10 +5,44 @@
 const int PuzzleSolver::directions[4][2] = {{-1,0}, {1,0}, {0,-1}, {0,1}};
 
 PuzzleSolver::PuzzleSolver(Graph &graph) : puzzle(graph) {
-    int queensPlaced = 0;
-    int backtrackCount = 0;
-    int probeCount = 0;
-    int inferredCount = 0;
+    // int queensPlaced = 0;
+    // int backtrackCount = 0;
+    // int probeCount = 0;
+    // int inferredCount = 0;
+}
+
+bool PuzzleSolver::solvePuzzle(int row, int n) {
+
+    if (row == n) {return true;} 
+
+    for (int col = 0; col < n; ++col) {
+        if (puzzle.getMasked()[row][col] == -1) { // Check to see if square is unknown
+            int inferredColour = inferNeighbours(row, col);
+            if (inferredColour != -1) { // If we can infer the colour
+                puzzle.getMasked()[row][col] = inferredColour;
+                inferredCount++;
+                std::cout << "Inferred color " << inferredColour << " at (" << row << "," << col << ")\n";
+            } else {
+                probe(row, col); // Probe
+                // continue; 
+
+            }
+
+        }
+
+        if (isValid(row, col)) {
+            int originalColor = puzzle.getMasked()[row][col];
+            puzzle.getCurrentState()[row][col] = 0;  // Place queen
+            queensPlaced++;
+
+            if (solvePuzzle(row + 1, n))
+                return true; 
+
+            puzzle.getCurrentState()[row][col] = originalColor; // Backtrack
+            backtrackCount++;
+        }
+    }
+    return false;
 }
 
 int PuzzleSolver::inferNeighbours(int row, int col) {
@@ -73,39 +107,6 @@ bool PuzzleSolver::isValid(int row, int col) {
 
 }
 
-bool PuzzleSolver::solvePuzzle(int row, int n) {
-
-    if (row == n) {return true;} 
-
-    for (int col = 0; col < n; ++col) {
-        if (puzzle.getMasked()[row][col] == -1) { // Check to see if square is unknown
-
-            int inferredColour = inferNeighbours(row, col);
-            if (inferredColour != -1) { // If we can infer the colour
-                puzzle.getMasked()[row][col] = inferredColour;
-                inferredCount++;
-                std::cout << "Inferred color " << inferredColour << " at (" << row << "," << col << ")\n";
-            } else {
-                probe(row, col); // Probe
-                continue;
-            }
-
-        }
-
-        if (isValid(row, col)) {
-            int originalColor = puzzle.getMasked()[row][col];
-            puzzle.getCurrentState()[row][col] = 0;  // Place queen
-            queensPlaced++;
-
-            if (solvePuzzle(row + 1, n))
-                return true; 
-
-            puzzle.getCurrentState()[row][col] = originalColor; // Backtrack
-            backtrackCount++;
-        }
-    }
-    return false;
-}
 
 void PuzzleSolver::printStatistics() {
     std::cout << "\n=== Solver Statistics ===" << std::endl;

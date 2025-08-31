@@ -7,6 +7,8 @@
 #include <vector>
 #include <fstream>
 #include "graph.h"
+#include <set>
+#include <cfloat>
 
 class PuzzleSolver {
 
@@ -18,15 +20,14 @@ class PuzzleSolver {
 
         static const int directions[4][2]; // Directions for checking diagonals and columns
 
-        int queensPlaced;
-        int backtrackCount;
-        int probeCount;
-        int inferredCount;
+        int queensPlaced = 0;
+        int backtrackCount = 0;
+        int probeCount = 0;
+        int inferredCount = 0;
 
         PuzzleSolver(Graph &graph);
 
-        int inferNeighbours(int row, int col);
-        
+        int inferNeighbours(int row, int col);      
         void processColours();
         void probe(int row, int col);
         bool isValid(int row, int col);
