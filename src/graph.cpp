@@ -43,7 +43,7 @@ Graph::Graph() {
 
 // Constructor
 Graph::Graph(const std::vector<std::vector<int>>& data) 
-    : original(data), currentState(data), masked(createMaskedMatrix(data, 0.3)) {}
+    : original(data), currentState(data), masked(createMaskedMatrix("puzzles_masked.txt")) {}
 
 const std::vector<std::vector<int>>& Graph::getOriginal() {
     return original;
@@ -128,5 +128,29 @@ std::vector<std::vector<int>> Graph::createMaskedMatrix(const std::vector<std::v
             }
         }
     }
+    return masked;
+}
+
+std::vector<std::vector<int>> Graph::createMaskedMatrix(std::string filename) {
+    std::vector<std::vector<int>> masked;
+    std::ifstream puzzleFile(filename);
+
+    if (!puzzleFile.is_open()) {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        return masked;
+    }
+
+    int graphSize;
+    puzzleFile >> graphSize;
+
+    // Create 2d Matrix to hold txt data - resize to graphSize x graphSize
+    masked.resize(graphSize, std::vector<int>(graphSize));
+
+    for (int row = 0; row < graphSize; row++) {
+        for (int col = 0; col < graphSize; col++) {
+            puzzleFile >> masked[row][col];
+        }
+    }
+    puzzleFile.close();
     return masked;
 }

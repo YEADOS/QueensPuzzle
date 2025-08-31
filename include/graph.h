@@ -26,6 +26,7 @@ class Graph {
         std::vector<std::vector<int>> currentState;
 
         std::vector<std::vector<int>> createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob);
+        std::vector<std::vector<int>> createMaskedMatrix(std::string filename);
         
     public: 
 
