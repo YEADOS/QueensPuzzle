@@ -2,26 +2,28 @@
 #include "../include/PuzzleSolver.h"
 #include <string>
 
-
-int main() {
+int main()
+{
 
     int numPuzzles = 1;
     std::string puzzleFileName = "puzzles.txt";
     std::vector<Graph> graphs;
     // std::vector<Graph> Graphs; = PuzzleManager::loadFromFile(puzzleFileName, numPuzzles);
     PuzzleManager::loadFromFile(puzzleFileName, numPuzzles, graphs);
-    for (auto &g : graphs) {
-
+    for (auto &g : graphs)
+    {
 
         PuzzleSolver solver(g);
         // g.printGraph(g.ORIGINAL);
         // Initial masked
         g.printGraph(g.MASKED);
 
-        if (!solver.solvePuzzle(0, g.getSize())) {
+        if (!solver.solvePuzzle(0, g.getSize()))
+        {
             std::cout << "No solution found.\n";
         }
-        else {
+        else
+        {
             std::cout << "Original.\n";
             g.printGraph(g.ORIGINAL);
             std::cout << "Current.\n";
@@ -31,8 +33,6 @@ int main() {
             std::cout << "Solution found.\n";
         }
         solver.printStatistics();
-        
-
 
         // if (!g.solvePuzzle(0, g.getSize())) {
         //     std::cout << "No solution found.\n";
@@ -41,4 +41,3 @@ int main() {
 
     return 0;
 }
-

@@ -1,5 +1,5 @@
 #ifndef PUZZLE_SOLVER_H
-#define PUZZLE_SOLVER_H 
+#define PUZZLE_SOLVER_H
 
 #include <iostream>
 #include <stdio.h>
@@ -9,32 +9,50 @@
 #include "graph.h"
 #include <set>
 #include <cfloat>
+#include <climits>
+#include <map>
 
-class PuzzleSolver {
+struct ColorDomain
+{
+    int minRow = INT_MAX, maxRow = -1;
+    int minCol = INT_MAX, maxCol = -1;
 
-    private: 
+    bool contains(int row, int col)
+    {
+        return row >= minRow && row <= maxRow &&
+               col >= minCol && col <= maxCol;
+    }
+};
 
-        Graph &puzzle;
+class PuzzleSolver
+{
 
-    public:
+private:
+    Graph &puzzle;
+    void computeColorDomains(std::map<int, ColorDomain> &domains);
+    int inferWithConfidence(int row, int col);
+    int inferFromContiguity(int row, int col);
+    int inferFromDomains(int row, int col);
+    int inferRowColumnUniformity(int row, int col);
+    int inferPatternCompletion(int row, int col);
 
-        static const int directions[4][2]; // Directions for checking diagonals and columns
+public:
+    static const int directions[4][2]; // Directions for checking diagonals and columns
 
-        int queensPlaced = 0;
-        int backtrackCount = 0;
-        int probeCount = 0;
-        int inferredCount = 0;
+    int queensPlaced = 0;
+    int backtrackCount = 0;
+    int probeCount = 0;
+    int inferredCount = 0;
 
-        PuzzleSolver(Graph &graph);
+    PuzzleSolver(Graph &graph);
 
-        int inferNeighbours(int row, int col);      
-        void processColours();
-        void probe(int row, int col);
-        bool isValid(int row, int col);
-        bool solvePuzzle(int start, int size);
-        void printStatistics();
-
+    void performFullInference(int n);
+    int inferNeighbours(int row, int col);
+    void processColours();
+    void probe(int row, int col);
+    bool isValid(int row, int col);
+    bool solvePuzzle(int start, int size);
+    void printStatistics();
 };
 
 #endif
-
