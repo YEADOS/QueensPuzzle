@@ -1,4 +1,6 @@
 #include "../include/graph.h"
+#include <map>
+#include <set>
 
 // Queen is represented by 0
 // Non-queen spot represented by -1
@@ -42,8 +44,8 @@ Graph::Graph() {
 }
 
 // Constructor
-Graph::Graph(const std::vector<std::vector<int>>& data) 
-    : original(data), currentState(data), masked(createMaskedMatrix("puzzles_masked.txt")) {}
+Graph::Graph(const std::vector<std::vector<int>>& data)
+    : original(data), currentState(data), masked(createMaskedMatrix(data, 0.2)) {}
 
 const std::vector<std::vector<int>>& Graph::getOriginal() {
     return original;
@@ -152,5 +154,91 @@ std::vector<std::vector<int>> Graph::createMaskedMatrix(std::string filename) {
         }
     }
     puzzleFile.close();
+    return masked;
+}
+
+std::vector<std::vector<int>> Graph::createSmartMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob) {
+    std::vector<std::vector<int>> masked = original;
+    int n = original.size();
+
+    // Step 1: Count cells for each color
+    std::map<int, int> colorCounts;
+    std::map<int, std::vector<std::pair<int, int>>> colorPositions;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int color = original[i][j];
+            colorCounts[color]++;
+            colorPositions[color].push_back({i, j});
+        }
+    }
+
+    // Step 2: Identify single-cell colored sections (don't mask these)
+    std::set<std::pair<int, int>> preservePositions;
+    for (auto& [color, count] : colorCounts) {
+        if (count == 1) {
+            // Preserve single-cell colors
+            preservePositions.insert(colorPositions[color][0]);
+            std::cout << "Preserving single-cell color " << color
+                     << " at (" << colorPositions[color][0].first
+                     << "," << colorPositions[color][0].second << ")\n";
+        }
+    }
+
+    // Step 3: Smart masking strategy
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::bernoulli_distribution mask(mask_prob);
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            // Never mask single-cell colors
+            if (preservePositions.count({i, j})) {
+                continue;
+            }
+
+            int color = original[i][j];
+
+            // For colors with few cells (2-3), mask more conservatively
+            if (colorCounts[color] <= 3) {
+                std::bernoulli_distribution conservativeMask(mask_prob * 0.5);
+                if (conservativeMask(gen)) {
+                    masked[i][j] = -1;
+                }
+            }
+            // For edge/corner positions, mask less aggressively (easier to infer)
+            else if (i == 0 || i == n-1 || j == 0 || j == n-1) {
+                std::bernoulli_distribution edgeMask(mask_prob * 0.7);
+                if (edgeMask(gen)) {
+                    masked[i][j] = -1;
+                }
+            }
+            // Regular masking for other positions
+            else if (mask(gen)) {
+                masked[i][j] = -1;
+            }
+        }
+    }
+
+    // Step 4: Ensure each color has at least one visible cell for inference
+    for (auto& [color, positions] : colorPositions) {
+        bool hasVisible = false;
+        for (auto& pos : positions) {
+            if (masked[pos.first][pos.second] != -1) {
+                hasVisible = true;
+                break;
+            }
+        }
+
+        // If all cells of a color are masked, reveal at least one
+        if (!hasVisible && !positions.empty()) {
+            int revealIdx = gen() % positions.size();
+            auto revealPos = positions[revealIdx];
+            masked[revealPos.first][revealPos.second] = color;
+            std::cout << "Revealing at least one cell of color " << color
+                     << " at (" << revealPos.first << "," << revealPos.second << ")\n";
+        }
+    }
+
     return masked;
 }

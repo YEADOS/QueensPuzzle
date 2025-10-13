@@ -6,6 +6,12 @@ SRC_DIR = src
 INC_DIR = include
 BIN_DIR = bin
 
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+$(BIN_DIR)/%: $(SRC_DIR)/%.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
 TARGET = $(BIN_DIR)/main.out
 
 # $(TARGET): graph.o
