@@ -2,6 +2,8 @@
 #include "../include/PuzzleSolver.h"
 #include <string>
 
+// Key: {Queen = 0, Masked = -1, Colour Square = 1 to N-Colours}
+
 int main()
 {
 

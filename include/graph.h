@@ -9,6 +9,7 @@
 #include <random>
 #include <iostream>
 
+// Key: {Queen = 0, Masked = -1, Colour Square = 1 to N-Colours}
 
 class Graph {
 
