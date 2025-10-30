@@ -28,6 +28,8 @@ int main()
         if (!solver.solveWithMinimalProbing(g.getSize()))
         {
             std::cout << "❌ PUZZLE " << puzzleNumber << " - No solution found.\n";
+            std::cout << "Partial solution (queens placed so far):\n";
+            g.printGraph(g.CURRENT_SYMBOLS);
         }
         else
         {
@@ -55,6 +57,9 @@ int main()
     std::cout << "\n======= FINAL RESULTS =======" << std::endl;
     std::cout << "Solved: " << solvedCount << "/" << numPuzzles << " puzzles" << std::endl;
     std::cout << "Success rate: " << (100.0 * solvedCount / numPuzzles) << "%" << std::endl;
+
+    // Explicitly clear the graphs vector to avoid cleanup issues with large datasets
+    graphs.clear();
 
     return 0;
 }

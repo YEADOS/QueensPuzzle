@@ -14,95 +14,7 @@ PuzzleSolver::PuzzleSolver(Graph &graph) : puzzle(graph)
     // int inferredCount = 0;
 }
 
-bool PuzzleSolver::solvePuzzle(int row, int n)
-{
-    if (row == n)
-    {
-        return true;
-    }
 
-    // IMPROVEMENT 1: Do a full inference pass before attempting to place queens
-    // This maximizes inference and minimizes probing
-    performFullInference(n);
-
-    for (int col = 0; col < n; ++col)
-    {
-        // IMPROVEMENT 2: Global Active Sensing Strategy
-        if (puzzle.getMasked()[row][col] == -1)
-        {
-            // Try one more targeted inference for this specific cell
-            int inferredColour = inferWithConfidence(row, col);
-
-            if (inferredColour != -1)
-            {
-                puzzle.getMasked()[row][col] = inferredColour;
-                inferredCount++;
-                std::cout << "Inferred color " << inferredColour
-                          << " at (" << row << "," << col << ")\n";
-            }
-            else
-            {
-                // Local active sensing - simulate nearby options and pick best
-                auto bestLocalProbe = selectBestLocalProbe(row, col, n);
-                if (bestLocalProbe.first != -1 && bestLocalProbe.second != -1) {
-                    std::cout << "LOCAL ACTIVE SENSING: Choosing (" << bestLocalProbe.first
-                             << "," << bestLocalProbe.second << ") over current (" << row << "," << col << ")\n";
-                    probe(bestLocalProbe.first, bestLocalProbe.second);
-                } else {
-                    // Fallback to current position
-                    probe(row, col);
-                }
-            }
-        }
-
-        if (isValid(row, col))
-        {
-            int originalColor = puzzle.getMasked()[row][col];
-            puzzle.getCurrentState()[row][col] = 0; // Place queen
-            queensPlaced++;
-
-            if (solvePuzzle(row + 1, n))
-                return true;
-
-            puzzle.getCurrentState()[row][col] = originalColor; // Backtrack
-            backtrackCount++;
-        }
-    }
-    return false;
-}
-
-void PuzzleSolver::performFullInference(int n)
-{
-    bool madeInference;
-    int passes = 0;
-
-    do
-    {
-        madeInference = false;
-        passes++;
-
-        for (int r = 0; r < n; r++)
-        {
-            for (int c = 0; c < n; c++)
-            {
-                if (puzzle.getMasked()[r][c] == -1)
-                {
-                    // Try multiple inference strategies
-                    int inferredColor = inferWithConfidence(r, c);
-
-                    if (inferredColor != -1)
-                    {
-                        puzzle.getMasked()[r][c] = inferredColor;
-                        inferredCount++;
-                        madeInference = true;
-                        std::cout << "Pass " << passes << ": Inferred color "
-                                  << inferredColor << " at (" << r << "," << c << ")\n";
-                    }
-                }
-            }
-        }
-    } while (madeInference && passes < 10); // Limit passes to avoid infinite loops
-}
 
 int PuzzleSolver::inferNeighbours(int row, int col)
 {
@@ -149,7 +61,6 @@ int PuzzleSolver::inferWithConfidence(int row, int col)
     int uniformInfer = inferRowColumnUniformity(row, col);
     if (uniformInfer != -1)
     {
-        std::cout << "Fired\n";
         colorConfidence[uniformInfer] += 2.5;
     }
 
@@ -176,7 +87,8 @@ int PuzzleSolver::inferWithConfidence(int row, int col)
 
     // Find color with highest confidence
     int bestColor = -1;
-    float maxConfidence = 3.0; // Minimum threshold
+    float maxConfidence = 4.5; // Minimum threshold (increased from 3.0 - more conservative)
+                                // This makes inference harder, forcing more strategic probing
 
     for (auto &[color, confidence] : colorConfidence)
     {
@@ -362,19 +274,174 @@ int PuzzleSolver::inferFromContiguity(int row, int col)
     return -1;
 }
 
+int PuzzleSolver::countUnknownNeighbors(int row, int col, int n)
+{
+    int unknownCount = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        int newRow = row + directions[i][0];
+        int newCol = col + directions[i][1];
+
+        if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n)
+        {
+            if (puzzle.getMasked()[newRow][newCol] == -1)
+            {
+                unknownCount++;
+            }
+        }
+    }
+    return unknownCount;
+}
+
+double PuzzleSolver::calculateProbeValue(int row, int col, int n)
+{
+    double value = 0.0;
+
+    // 1. Number of unknown neighbors (higher = more potential inferences)
+    int unknownNeighbors = countUnknownNeighbors(row, col, n);
+    value += unknownNeighbors * 2.0;
+
+    // 2. Strategic position bonus (corners and edges)
+    if ((row == 0 || row == n-1) && (col == 0 || col == n-1))
+        value += 1.5; // Corner
+    else if (row == 0 || row == n-1 || col == 0 || col == n-1)
+        value += 1.0; // Edge
+
+    // 3. Bridging potential - different colored neighbors
+    std::set<int> neighborColors;
+    for (int i = 0; i < 4; i++)
+    {
+        int newRow = row + directions[i][0];
+        int newCol = col + directions[i][1];
+
+        if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n)
+        {
+            int color = puzzle.getMasked()[newRow][newCol];
+            if (color != -1)
+            {
+                neighborColors.insert(color);
+            }
+        }
+    }
+    if (neighborColors.size() >= 2)
+        value += neighborColors.size() * 1.5; // Bridges multiple regions
+
+    // 4. Row criticality - prioritize rows without queens
+    bool rowHasQueen = false;
+    for (int c = 0; c < n; c++)
+    {
+        if (puzzle.getCurrentState()[row][c] == 0)
+        {
+            rowHasQueen = true;
+            break;
+        }
+    }
+    if (!rowHasQueen)
+        value += 2.0; // This row needs a queen
+
+    return value;
+}
+
+void PuzzleSolver::performInferenceCascade(int n)
+{
+    bool madeProgress = true;
+    int maxPasses = 2; // Reduced from 5 to 2 - less aggressive propagation
+                       // This forces more reliance on strategic probing
+    int passes = 0;
+
+    while (madeProgress && passes < maxPasses)
+    {
+        madeProgress = false;
+        passes++;
+
+        for (int r = 0; r < n; r++)
+        {
+            for (int c = 0; c < n; c++)
+            {
+                if (puzzle.getMasked()[r][c] == -1)
+                {
+                    int inferredColor = inferWithConfidence(r, c);
+                    if (inferredColor != -1)
+                    {
+                        puzzle.getMasked()[r][c] = inferredColor;
+                        inferredCount++;
+                        madeProgress = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool PuzzleSolver::hasQueenInColor(int color)
+{
+    int n = puzzle.getOriginal().size();
+    for (int r = 0; r < n; r++)
+    {
+        for (int c = 0; c < n; c++)
+        {
+            if (puzzle.getCurrentState()[r][c] == 0)
+            { // Found a queen
+                int queenColor = puzzle.getMasked()[r][c];
+                if (queenColor == color)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool PuzzleSolver::validateFinalSolution(std::vector<std::pair<int, int>>& queenPositions)
+{
+    int n = puzzle.getOriginal().size();
+
+    // First, probe any unknown queen positions (minimal probing)
+    for (auto [r, c] : queenPositions) {
+        if (puzzle.getMasked()[r][c] == -1) {
+            probe(r, c);
+        }
+    }
+
+    // Now validate all color constraints
+    for (size_t i = 0; i < queenPositions.size(); i++) {
+        int r1 = queenPositions[i].first;
+        int c1 = queenPositions[i].second;
+        int color1 = puzzle.getMasked()[r1][c1];
+
+        for (size_t j = i + 1; j < queenPositions.size(); j++) {
+            int r2 = queenPositions[j].first;
+            int c2 = queenPositions[j].second;
+            int color2 = puzzle.getMasked()[r2][c2];
+
+            // Check if same color
+            if (color1 == color2) {
+                return false; // Color constraint violated
+            }
+        }
+    }
+
+    return true; // All constraints satisfied
+}
+
 void PuzzleSolver::probe(int row, int col)
 {
     probeCount++;
     int colour = puzzle.getOriginal()[row][col];
-    std::cout << "Probed color " << colour << " at (" << row << "," << col << ")\n";
     puzzle.getMasked()[row][col] = colour;
 }
 
 bool PuzzleSolver::isValid(int row, int col)
 {
-
     int n = puzzle.getOriginal().size();
     int currentColour = puzzle.getMasked()[row][col]; // Get the actual color of this cell
+
+    // CRITICAL: Cannot validate if current cell color is unknown
+    if (currentColour == -1)
+    {
+        return false; // Must know the color before placing queen
+    }
 
     // Check to see if the queen is in the same column
     for (int i = 0; i < row; i++)
@@ -385,356 +452,81 @@ bool PuzzleSolver::isValid(int row, int col)
         }
     }
 
-    // Check all diagonal adjacency with ALL previously placed queens
+    // Check diagonal adjacency ONLY (not horizontal/vertical)
+    // LinkedIn Queens allows horizontal/vertical adjacency, only diagonal touching is forbidden
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < n; j++) {
             if (puzzle.getCurrentState()[i][j] == 0) { // Found a previously placed queen
-                // Check if diagonally adjacent (any diagonal direction)
+                // Check if diagonally adjacent (exactly 1 step diagonal - touching corners)
                 if (abs(row - i) == 1 && abs(col - j) == 1) {
                     return false; // Diagonally adjacent queens not allowed
-                }
-
-                // Also check if horizontally or vertically adjacent
-                if ((abs(row - i) == 1 && col == j) || (row == i && abs(col - j) == 1)) {
-                    return false; // Adjacent queens not allowed
                 }
             }
         }
     }
 
+    // Color constraint: OPTIMISTIC VALIDATION
+    // Check if any previously placed queen with KNOWN color has the same color
+    // Unknown colors are assumed to be different (optimistic)
     for (int i = 0; i < row; ++i)
     {
         for (int j = 0; j < n; ++j)
         {
-            if (puzzle.getCurrentState()[i][j] == 0 && puzzle.getMasked()[i][j] == currentColour) // add condition to check if there's a -1 meaning it is unsure of if its correct
-                return false;
+            if (puzzle.getCurrentState()[i][j] == 0) // Found a queen
+            {
+                int queenColor = puzzle.getMasked()[i][j];
+                // If previous queen color is known and matches, that's a conflict
+                if (queenColor != -1 && queenColor == currentColour)
+                {
+                    return false; // Two queens in same color region
+                }
+                // If queenColor == -1 (unknown), optimistically assume it's different
+            }
         }
     }
     return true;
 }
 
-double PuzzleSolver::calculateProbeValue(int row, int col)
-{
-    if (puzzle.getMasked()[row][col] != -1) {
-        return 0.0; // Already known
-    }
-
-    double value = 0.0;
-    int n = puzzle.getOriginal().size();
-
-    // Factor 1: Number of unknown neighbors (higher = more valuable)
-    int unknownNeighbors = 0;
-    int knownNeighbors = 0;
-
-    for (int i = 0; i < 4; i++) {
-        int nr = row + directions[i][0];
-        int nc = col + directions[i][1];
-
-        if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
-            if (puzzle.getMasked()[nr][nc] == -1) {
-                unknownNeighbors++;
-            } else {
-                knownNeighbors++;
-            }
-        }
-    }
-
-    // Higher value if this probe would help infer many neighbors
-    value += unknownNeighbors * 2.0;
-
-    // Factor 2: Strategic position (corners and edges are often easier to infer)
-    if ((row == 0 || row == n-1) && (col == 0 || col == n-1)) {
-        value += 1.5; // Corner
-    } else if (row == 0 || row == n-1 || col == 0 || col == n-1) {
-        value += 1.0; // Edge
-    }
-
-    // Factor 3: Would this probe bridge disconnected regions?
-    std::map<int, int> neighborColors;
-    for (int i = 0; i < 4; i++) {
-        int nr = row + directions[i][0];
-        int nc = col + directions[i][1];
-
-        if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
-            int color = puzzle.getMasked()[nr][nc];
-            if (color != -1) {
-                neighborColors[color]++;
-            }
-        }
-    }
-
-    // If multiple different colors adjacent, this might be a bridge point
-    if (neighborColors.size() >= 2) {
-        value += 3.0;
-    }
-
-    // Factor 4: Would help with queen placement constraints?
-    // Check if this is in a critical row for queen placement
-    bool criticalForQueens = false;
-    int queensInRow = 0;
-    for (int c = 0; c < n; c++) {
-        if (puzzle.getCurrentState()[row][c] == 0) {
-            queensInRow++;
-        }
-    }
-
-    if (queensInRow == 0) { // No queen placed in this row yet
-        value += 1.5;
-    }
-
-    return value;
-}
-
-std::pair<int, int> PuzzleSolver::selectBestProbeTarget(int n)
-{
-    double bestValue = -1.0;
-    std::pair<int, int> bestTarget = {-1, -1};
-
-    // Evaluate all unknown positions
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getMasked()[r][c] == -1) {
-                double value = calculateProbeValue(r, c);
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestTarget = {r, c};
-                }
-            }
-        }
-    }
-
-    // If we found a valuable target, use it
-    if (bestValue > 2.0) { // Threshold for "worth probing"
-        std::cout << "Smart probe selection: (" << bestTarget.first
-                 << "," << bestTarget.second << ") with value " << bestValue << "\n";
-        return bestTarget;
-    }
-
-    return {-1, -1}; // No good probe target found
-}
-
-bool PuzzleSolver::shouldSkipCurrentPosition(int currentRow, int currentCol, int n)
-{
-    // Calculate value of current position
-    double currentValue = calculateProbeValue(currentRow, currentCol);
-
-    // Find the globally best probe position
-    auto globalBest = selectGlobalBestProbe(currentRow, currentCol, n);
-
-    if (globalBest.first == -1) {
-        return false; // No alternative found
-    }
-
-    double globalBestValue = calculateProbeValue(globalBest.first, globalBest.second);
-
-    // Skip current position if global best is significantly better
-    bool shouldSkip = globalBestValue > (currentValue * skipThreshold);
-
-    if (shouldSkip) {
-        std::cout << "SKIP DECISION: Current (" << currentRow << "," << currentCol
-                 << ") value=" << currentValue
-                 << " vs Global best (" << globalBest.first << "," << globalBest.second
-                 << ") value=" << globalBestValue << " (threshold=" << skipThreshold << ")\n";
-    }
-
-    return shouldSkip;
-}
-
-std::pair<int, int> PuzzleSolver::selectGlobalBestProbe(int currentRow, int currentCol, int n)
-{
-    double bestValue = -1.0;
-    std::pair<int, int> bestTarget = {-1, -1};
-
-    // Evaluate ALL unknown positions globally (not just current row/col vicinity)
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getMasked()[r][c] == -1) {
-                double value = calculateProbeValue(r, c);
-
-                // Add bonus for positions that would unlock many inferences
-                // (simulate lookahead: what could we infer after this probe?)
-                double lookaheadBonus = 0.0;
-
-                // Count how many unknown neighbors this position has
-                int unknownNeighborsOfNeighbors = 0;
-                for (int i = 0; i < 4; i++) {
-                    int nr = r + directions[i][0];
-                    int nc = c + directions[i][1];
-
-                    if (nr >= 0 && nr < n && nc >= 0 && nc < n && puzzle.getMasked()[nr][nc] == -1) {
-                        // Count neighbors of this neighbor (cascade effect)
-                        for (int j = 0; j < 4; j++) {
-                            int nnr = nr + directions[j][0];
-                            int nnc = nc + directions[j][1];
-
-                            if (nnr >= 0 && nnr < n && nnc >= 0 && nnc < n &&
-                                puzzle.getMasked()[nnr][nnc] == -1) {
-                                unknownNeighborsOfNeighbors++;
-                            }
-                        }
-                    }
-                }
-
-                // Bonus for positions that could trigger inference cascades
-                lookaheadBonus = unknownNeighborsOfNeighbors * 0.5;
-                value += lookaheadBonus;
-
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestTarget = {r, c};
-                }
-            }
-        }
-    }
-
-    return bestTarget;
-}
-
-
-std::vector<std::pair<int, int>> PuzzleSolver::getLocalProbeCandidate(int currentRow, int currentCol, int n)
-{
-    std::vector<std::pair<int, int>> candidates;
-
-    // Always include current position as baseline
-    if (puzzle.getMasked()[currentRow][currentCol] == -1) {
-        candidates.push_back({currentRow, currentCol});
-    }
-
-    // Add nearby unknown positions (within 2-cell radius)
-    int radius = 2;
-    for (int dr = -radius; dr <= radius; dr++) {
-        for (int dc = -radius; dc <= radius; dc++) {
-            int r = currentRow + dr;
-            int c = currentCol + dc;
-
-            if (r >= 0 && r < n && c >= 0 && c < n &&
-                puzzle.getMasked()[r][c] == -1 &&
-                !(r == currentRow && c == currentCol)) {
-
-                candidates.push_back({r, c});
-            }
-        }
-    }
-
-    // Limit to top 4 candidates to keep simulation manageable
-    if (candidates.size() > 4) {
-        // Sort by distance from current position (closer is better for local sensing)
-        std::sort(candidates.begin(), candidates.end(),
-                 [currentRow, currentCol](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-                     int distA = abs(a.first - currentRow) + abs(a.second - currentCol);
-                     int distB = abs(b.first - currentRow) + abs(b.second - currentCol);
-                     return distA < distB;
-                 });
-        candidates.resize(4);
-    }
-
-    return candidates;
-}
-
-int PuzzleSolver::simulateProbeOutcome(int row, int col, int n)
-{
-    // Create a temporary copy of the current masked state
-    auto originalMasked = puzzle.getMasked();
-
-    // Simulate the probe
-    int actualColor = puzzle.getOriginal()[row][col];
-    puzzle.getMasked()[row][col] = actualColor;
-
-    // Count how many new inferences this probe enables
-    int newInferences = 0;
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getMasked()[r][c] == -1) {
-                int inferredColor = inferWithConfidence(r, c);
-                if (inferredColor != -1) {
-                    newInferences++;
-                }
-            }
-        }
-    }
-
-    // Additional scoring factors
-    int score = newInferences * 10; // Base score from enabling inferences
-
-    // Bonus for positions that help with current row queen placement
-    bool helpsCurrentRow = true; // This probe is helping us make progress
-    if (helpsCurrentRow) {
-        score += 5;
-    }
-
-    // Bonus for strategic positions (corners, edges)
-    if ((row == 0 || row == n-1) && (col == 0 || col == n-1)) {
-        score += 3; // Corner
-    } else if (row == 0 || row == n-1 || col == 0 || col == n-1) {
-        score += 2; // Edge
-    }
-
-    // Restore original state
-    puzzle.getMasked() = originalMasked;
-
-    return score;
-}
-
-std::pair<int, int> PuzzleSolver::selectBestLocalProbe(int currentRow, int currentCol, int n)
-{
-    auto candidates = getLocalProbeCandidate(currentRow, currentCol, n);
-
-    if (candidates.empty()) {
-        return {-1, -1}; // No candidates
-    }
-
-    int bestScore = -1;
-    std::pair<int, int> bestCandidate = {-1, -1};
-
-    std::cout << "Simulating " << candidates.size() << " local probe candidates around ("
-              << currentRow << "," << currentCol << "):\n";
-
-    for (auto [r, c] : candidates) {
-        int score = simulateProbeOutcome(r, c, n);
-
-        std::cout << "  Candidate (" << r << "," << c << ") -> score: " << score << std::endl;
-
-        if (score > bestScore) {
-            bestScore = score;
-            bestCandidate = {r, c};
-        }
-    }
-
-    // Only choose an alternative if it's significantly better than current position
-    if (bestCandidate.first == currentRow && bestCandidate.second == currentCol) {
-        return {-1, -1}; // Current position is already best, no need to specify
-    }
-
-    // Require at least 20% better score to switch from current position
-    int currentScore = simulateProbeOutcome(currentRow, currentCol, n);
-    if (bestScore > currentScore * 1.2) {
-        std::cout << "Selecting (" << bestCandidate.first << "," << bestCandidate.second
-                 << ") with score " << bestScore << " over current score " << currentScore << std::endl;
-        return bestCandidate;
-    }
-
-    return {-1, -1}; // Current position is good enough
-}
 
 void PuzzleSolver::printStatistics()
 {
-    std::cout << "\n=== GLOBAL ACTIVE SENSING Statistics ===" << std::endl;
-    std::cout << "Queen placements: " << queensPlaced << std::endl;
+    std::cout << "\n=== MINIMAL SENSING Statistics ===" << std::endl;
+    std::cout << "Final queens placed: " << queensPlaced << std::endl;
+    std::cout << "Total placement attempts: " << totalQueensPlaced << std::endl;
     std::cout << "Backtracks: " << backtrackCount << std::endl;
+
+    // MINIMAL SENSING: Show budget information
+    if (probeBudget > 0) {
+        std::cout << "\n--- Probe Budget ---" << std::endl;
+        std::cout << "Initially unknown cells: " << initialUnknownCells << std::endl;
+        std::cout << "Probe budget: " << probeBudget << " ("
+                  << (double)probeBudget/initialUnknownCells*100 << "% of unknowns)" << std::endl;
+        std::cout << "Probes used: " << probeCount << " / " << probeBudget;
+        if (budgetExhausted) {
+            std::cout << " ⚠️  BUDGET EXHAUSTED";
+        }
+        std::cout << std::endl;
+        std::cout << "Budget remaining: " << (probeBudget - probeCount) << std::endl;
+
+        int totalRevealed = probeCount + inferredCount;
+        double revelationPercent = (double)totalRevealed / initialUnknownCells * 100.0;
+        std::cout << "Total cells revealed: " << totalRevealed << " / " << initialUnknownCells
+                  << " (" << revelationPercent << "%)" << std::endl;
+        std::cout << "Cells still unknown: " << (initialUnknownCells - totalRevealed)
+                  << " (" << (100.0 - revelationPercent) << "%)" << std::endl;
+    }
+
+    std::cout << "\n--- Sensing Operations ---" << std::endl;
     std::cout << "Probe operations: " << probeCount << std::endl;
     std::cout << "Inferred operations: " << inferredCount << std::endl;
-    std::cout << "Sensing budget used: " << (15 - sensingBudget) << "/15" << std::endl;
-    std::cout << "Remaining budget: " << sensingBudget << std::endl;
 
-    // Calculate efficiency metrics
-    double efficiency = (double)queensPlaced / (queensPlaced + backtrackCount + 1);
+    double efficiency = (double)queensPlaced / (totalQueensPlaced + 1);
     double inferenceRatio = (double)inferredCount / (inferredCount + probeCount + 1);
-    double budgetEfficiency = (double)probeCount / 15.0; // How much of budget was used
 
-    std::cout << "Search efficiency: " << efficiency << std::endl;
-    std::cout << "Inference vs Probe ratio: " << inferenceRatio << std::endl;
-    std::cout << "Budget efficiency: " << budgetEfficiency << " (lower is better)" << std::endl;
-    std::cout << "Total operations: " << (queensPlaced + backtrackCount + probeCount + inferredCount) << std::endl;
+    std::cout << "\n--- Efficiency Metrics ---" << std::endl;
+    std::cout << "Search efficiency: " << efficiency << " (final queens / total attempts)" << std::endl;
+    std::cout << "Inference ratio: " << inferenceRatio << " (inferred / total sensing)" << std::endl;
+    std::cout << "Total operations: " << (totalQueensPlaced + backtrackCount + probeCount + inferredCount) << std::endl;
 }
 
 void PuzzleSolver::verifyQueenPlacement()
@@ -781,16 +573,10 @@ void PuzzleSolver::verifyQueenPlacement()
                     hasViolations = true;
                 }
 
-                // Check diagonal constraint (must be exactly 1 step diagonally)
+                // Check diagonal adjacency constraint (LinkedIn Queens rule)
+                // NOTE: Horizontal/vertical adjacency is ALLOWED in LinkedIn Queens
                 if (abs(r2 - r) == 1 && abs(c2 - c) == 1) {
                     std::cout << "❌ VIOLATION: Queens diagonally adjacent (" << r << "," << c
-                             << ") and (" << r2 << "," << c2 << ")" << std::endl;
-                    hasViolations = true;
-                }
-
-                // Check horizontally/vertically adjacent constraint
-                if ((abs(r2 - r) == 1 && c2 == c) || (r2 == r && abs(c2 - c) == 1)) {
-                    std::cout << "❌ VIOLATION: Queens horizontally/vertically adjacent (" << r << "," << c
                              << ") and (" << r2 << "," << c2 << ")" << std::endl;
                     hasViolations = true;
                 }
@@ -835,10 +621,9 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
     std::vector<std::pair<int, int>> viablePositions;
 
     for (int col = 0; col < n; col++) {
-        // Quick constraint check without knowing the color
         bool basicConstraintsOK = true;
 
-        // Check column constraint
+        // Check column constraint - no queen above in same column
         for (int r = 0; r < row; r++) {
             if (puzzle.getCurrentState()[r][col] == 0) {
                 basicConstraintsOK = false;
@@ -846,12 +631,46 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
             }
         }
 
-        // Check diagonal constraints
-        if (basicConstraintsOK && row > 0) {
-            if (col > 0 && puzzle.getCurrentState()[row - 1][col - 1] == 0)
-                basicConstraintsOK = false;
-            if (col < n - 1 && puzzle.getCurrentState()[row - 1][col + 1] == 0)
-                basicConstraintsOK = false;
+        // Check diagonal adjacency ONLY with previous queens (LinkedIn Queens rules)
+        if (basicConstraintsOK) {
+            for (int r = 0; r < row; r++) {
+                for (int c = 0; c < n; c++) {
+                    if (puzzle.getCurrentState()[r][c] == 0) { // Found a previous queen
+                        // Check diagonal adjacency (touching corners) - this is the only adjacency rule
+                        if (abs(row - r) == 1 && abs(col - c) == 1) {
+                            basicConstraintsOK = false;
+                            break;
+                        }
+                    }
+                }
+                if (!basicConstraintsOK) break;
+            }
+        }
+
+        // Check color constraint - we need to know the color before placing
+        // This prevents optimistic failures that cause excessive backtracking
+        if (basicConstraintsOK) {
+            int cellColor = puzzle.getMasked()[row][col];
+
+            // If color is unknown, try to infer it
+            if (cellColor == -1) {
+                int inferredColor = inferWithConfidence(row, col);
+                if (inferredColor != -1) {
+                    // Successfully inferred - update masked and check constraint
+                    puzzle.getMasked()[row][col] = inferredColor;
+                    inferredCount++;
+                    cellColor = inferredColor;
+                }
+                // If still unknown after inference attempt, keep as viable
+                // We'll probe it when we try to place a queen here
+            }
+
+            // If we now know the color, check if it already has a queen
+            if (cellColor != -1) {
+                if (hasQueenInColor(cellColor)) {
+                    basicConstraintsOK = false;
+                }
+            }
         }
 
         if (basicConstraintsOK) {
@@ -867,40 +686,99 @@ void PuzzleSolver::undoQueenPlacement(int row, int col)
     puzzle.getCurrentState()[row][col] = puzzle.getMasked()[row][col]; // Restore original color
     queensPlaced--;
     backtrackCount++;
+    // Note: totalQueensPlaced is NOT decremented - it tracks total placement attempts
     // std::cout << "🔙 BACKTRACK: Removed queen from (" << row << "," << col << ")\n"; // Removed verbose logging
 }
 
 bool PuzzleSolver::solveRowWithBacktracking(int row, int n, std::vector<std::pair<int, int>>& queenPositions)
 {
     if (row == n) {
-        return true; // Successfully placed all queens
+        // Successfully placed all queens - validate final solution
+        return validateFinalSolution(queenPositions);
     }
 
-    // std::cout << "\n--- SOLVING ROW " << row << " ---\n"; // Removed verbose logging
+    // Track best partial solution for failed attempts
+    if (queenPositions.size() > maxQueensPlaced) {
+        maxQueensPlaced = queenPositions.size();
+        bestPartialSolution = queenPositions;
+    }
 
     // Find all potentially viable positions for this row
     auto viablePositions = findViableQueenPositions(row, n);
 
-    // std::cout << "Found " << viablePositions.size() << " potentially viable positions in row " << row << "\n"; // Removed verbose logging
+    if (viablePositions.empty()) {
+        return false; // No viable positions
+    }
+
+    // Sort positions: known colors first, then by probe value (highest first)
+    std::vector<std::pair<double, std::pair<int, int>>> scoredPositions;
 
     for (auto [r, c] : viablePositions) {
-        // std::cout << "Trying position (" << r << "," << c << "):\n"; // Reduce verbosity
+        double score = 0.0;
 
-        // Check if we need to probe this position to make a decision
-        if (needsProbeForDecision(r, c)) {
-            std::cout << "PROBE: (" << r << "," << c << ") color " << puzzle.getOriginal()[r][c] << "\n";
-            probe(r, c);
+        if (puzzle.getMasked()[r][c] != -1) {
+            // Known color - highest priority (no probe needed)
+            score = 1000.0;
+        } else {
+            // Unknown color - try inference first
+            int inferredColor = inferWithConfidence(r, c);
+            if (inferredColor != -1) {
+                // Can be inferred - high priority
+                score = 500.0;
+            } else {
+                // Need to probe - score by probe value
+                score = calculateProbeValue(r, c, n);
+            }
         }
 
-        // Now check if this position is valid for queen placement
+        scoredPositions.push_back({score, {r, c}});
+    }
+
+    // Sort by score descending (highest score first)
+    std::sort(scoredPositions.begin(), scoredPositions.end(),
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    // Try positions in sorted order
+    for (auto& [score, pos] : scoredPositions) {
+        int r = pos.first;
+        int c = pos.second;
+
+        // CRITICAL: Ensure we know the color before placing a queen
+        // This prevents optimistic placement failures
+        if (puzzle.getMasked()[r][c] == -1) {
+            // Try inference first
+            int inferredColor = inferWithConfidence(r, c);
+            if (inferredColor != -1) {
+                puzzle.getMasked()[r][c] = inferredColor;
+                inferredCount++;
+            } else {
+                // Must probe to know the color
+                probe(r, c);
+                // Run inference cascade to potentially reveal more cells
+                performInferenceCascade(n);
+            }
+        }
+
+        // At this point, we must know the color of (r,c)
+        // Validate again now that we have color information
+        int cellColor = puzzle.getMasked()[r][c];
+        if (cellColor == -1) {
+            // Should never happen, but safety check
+            continue;
+        }
+
+        // Check if this color already has a queen
+        if (hasQueenInColor(cellColor)) {
+            continue; // Skip this position
+        }
+
+        // Now check all constraints with known color
         if (isValid(r, c)) {
             // Try placing queen here
             puzzle.getCurrentState()[r][c] = 0; // Place queen
             queensPlaced++;
+            totalQueensPlaced++;  // Track total attempts
             queenPositions.push_back({r, c});
-
-            // After placing a queen, do minimal targeted inference
-            // performFullInference(n); // This was revealing too much - comment out
 
             // Recursively solve the next row
             if (solveRowWithBacktracking(row + 1, n, queenPositions)) {
@@ -912,32 +790,501 @@ bool PuzzleSolver::solveRowWithBacktracking(int row, int n, std::vector<std::pai
             queenPositions.pop_back();
 
             // Note: We don't undo probes - once we probe a cell, we keep that knowledge
-            // This maintains active sensing efficiency
         }
     }
 
-    // std::cout << "❌ No valid queen placement found for row " << row << "\n"; // Removed verbose logging
     return false; // Could not place queen in this row
+}
+
+void PuzzleSolver::restoreBestPartialSolution()
+{
+    int n = puzzle.getOriginal().size();
+
+    // Clear current state
+    for (int r = 0; r < n; r++) {
+        for (int c = 0; c < n; c++) {
+            puzzle.getCurrentState()[r][c] = puzzle.getMasked()[r][c];
+        }
+    }
+
+    // Restore best partial solution
+    for (auto [r, c] : bestPartialSolution) {
+        puzzle.getCurrentState()[r][c] = 0; // Place queen
+    }
+}
+
+void PuzzleSolver::strategicSeedProbing(int n)
+{
+    // Strategic initial probing to seed inference system
+    // Probe corners and strategic positions to maximize inference cascade
+
+    std::vector<std::pair<int, int>> seedPositions;
+
+    // Corners (often constrained)
+    seedPositions.push_back({0, 0});
+    seedPositions.push_back({0, n-1});
+    seedPositions.push_back({n-1, 0});
+    seedPositions.push_back({n-1, n-1});
+
+    // Center position if board is large enough
+    if (n >= 5) {
+        seedPositions.push_back({n/2, n/2});
+    }
+
+    // Probe only unknown positions
+    for (auto [r, c] : seedPositions) {
+        if (puzzle.getMasked()[r][c] == -1) {
+            probe(r, c);
+        }
+    }
+
+    // Run inference cascade after seeding
+    performInferenceCascade(n);
 }
 
 bool PuzzleSolver::solveWithMinimalProbing(int n)
 {
-    // Skip aggressive inference - only probe what we actually need
-    // performFullInference(n); // This was revealing everything
+    // Clear any previous state
+    bestPartialSolution.clear();
+    maxQueensPlaced = 0;
 
-    // std::cout << "🧠 Starting minimal probing solver with backtracking\n"; // Removed verbose logging
+    // Use TRUE ACTIVE SENSING CSP approach
+    bool solved = solveWithActiveCSP(n);
 
-    std::vector<std::pair<int, int>> queenPositions; // Track queen positions for backtracking
-
-    bool solved = solveRowWithBacktracking(0, n, queenPositions);
-
-    if (solved) {
-        std::cout << "SOLUTION FOUND! Queens at: ";
-        for (auto [r, c] : queenPositions) {
-            std::cout << "(" << r << "," << c << ") ";
-        }
-        std::cout << "\n";
+    // If not solved, restore the best partial solution to the board
+    if (!solved && !bestPartialSolution.empty()) {
+        restoreBestPartialSolution();
     }
 
     return solved;
+}
+
+// ============================================================================
+// TRUE ACTIVE SENSING IMPLEMENTATION
+// ============================================================================
+
+double PuzzleSolver::calculateExpectedInformationGain(int row, int col, int n)
+{
+    // Calculate how much information we'd gain from probing this cell
+    double gain = 0.0;
+
+    // 1. Direct gain: we learn this cell's color
+    gain += 1.0;
+
+    // 2. Inference cascade potential: how many unknowns are in neighborhood?
+    int unknownNeighbors = countUnknownNeighbors(row, col, n);
+    gain += unknownNeighbors * 0.5; // Each unknown neighbor could be inferred
+
+    // 3. Strategic position value
+    gain += calculateProbeValue(row, col, n) * 0.1;
+
+    // 4. Constraint propagation potential: if we probe this, how many constraints tighten?
+    // Check if this cell is in a critical position for multiple colors
+    std::set<int> neighborColors;
+    for (int i = 0; i < 4; i++) {
+        int nr = row + directions[i][0];
+        int nc = col + directions[i][1];
+        if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+            int color = puzzle.getMasked()[nr][nc];
+            if (color != -1) {
+                neighborColors.insert(color);
+            }
+        }
+    }
+    gain += neighborColors.size() * 0.3; // More neighbor colors = more information
+
+    return gain;
+}
+
+std::vector<std::pair<int, int>> PuzzleSolver::getMostInformativeProbes(
+    int k, std::vector<std::pair<int, int>>& viablePositions)
+{
+    // Select k most informative cells to probe from viable positions
+    int n = puzzle.getOriginal().size();
+    std::vector<std::pair<double, std::pair<int, int>>> scoredProbes;
+
+    // Score all unknown cells in viable positions and their neighborhoods
+    std::set<std::pair<int, int>> candidates;
+
+    for (auto [r, c] : viablePositions) {
+        if (puzzle.getMasked()[r][c] == -1) {
+            candidates.insert({r, c});
+        }
+
+        // Also consider neighbors
+        for (int i = 0; i < 4; i++) {
+            int nr = r + directions[i][0];
+            int nc = c + directions[i][1];
+            if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+                if (puzzle.getMasked()[nr][nc] == -1) {
+                    candidates.insert({nr, nc});
+                }
+            }
+        }
+    }
+
+    // Score each candidate
+    for (auto [r, c] : candidates) {
+        double gain = calculateExpectedInformationGain(r, c, n);
+        scoredProbes.push_back({gain, {r, c}});
+    }
+
+    // Sort by gain (descending)
+    std::sort(scoredProbes.begin(), scoredProbes.end(),
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    // Return top k
+    std::vector<std::pair<int, int>> result;
+    for (int i = 0; i < std::min(k, (int)scoredProbes.size()); i++) {
+        result.push_back(scoredProbes[i].second);
+    }
+
+    return result;
+}
+
+void PuzzleSolver::propagateConstraints(int n)
+{
+    // After probing/inference, propagate constraints
+    // This is like AC-3 but simpler - just run inference cascade
+    performInferenceCascade(n);
+}
+
+int PuzzleSolver::countViablePositions(int row, int col, int n)
+{
+    // Count how many positions in this cell's row/col/color are still viable
+    int count = 0;
+
+    // If color is unknown, we can't count color constraint
+    int cellColor = puzzle.getMasked()[row][col];
+
+    // Count positions in same row
+    for (int c = 0; c < n; c++) {
+        if (c != col) {
+            auto viable = getViablePositionsForCell(row, c, n);
+            count += viable.size();
+        }
+    }
+
+    return count;
+}
+
+std::vector<std::pair<int, int>> PuzzleSolver::getViablePositionsForCell(int row, int col, int n)
+{
+    std::vector<std::pair<int, int>> viable;
+
+    // This cell is viable if:
+    // 1. No queen in same column (in previous rows)
+    // 2. No diagonally adjacent queen
+    // 3. Color doesn't already have queen (if known)
+
+    int cellColor = puzzle.getMasked()[row][col];
+
+    // Check column constraint
+    bool columnOK = true;
+    for (int r = 0; r < n; r++) {
+        if (r != row && puzzle.getCurrentState()[r][col] == 0) {
+            columnOK = false;
+            break;
+        }
+    }
+
+    if (!columnOK) return viable;
+
+    // Check diagonal adjacency
+    bool diagonalOK = true;
+    for (int r = 0; r < n; r++) {
+        for (int c = 0; c < n; c++) {
+            if (puzzle.getCurrentState()[r][c] == 0) {
+                if (abs(row - r) == 1 && abs(col - c) == 1) {
+                    diagonalOK = false;
+                    break;
+                }
+            }
+        }
+        if (!diagonalOK) break;
+    }
+
+    if (!diagonalOK) return viable;
+
+    // Check color constraint (if color is known)
+    if (cellColor != -1 && hasQueenInColor(cellColor)) {
+        return viable; // Empty
+    }
+
+    viable.push_back({row, col});
+    return viable;
+}
+
+std::pair<int, int> PuzzleSolver::selectMostConstrainedVariable(std::set<std::pair<int, int>>& unassigned)
+{
+    // MRV heuristic: select the cell with fewest viable positions
+    int n = puzzle.getOriginal().size();
+    std::pair<int, int> best = {-1, -1};
+    int minViable = INT_MAX;
+
+    for (auto [r, c] : unassigned) {
+        // Count how many positions are viable for this row
+        auto viable = findViableQueenPositions(r, n);
+        if (viable.size() < minViable && viable.size() > 0) {
+            minViable = viable.size();
+            best = {r, c};
+        }
+    }
+
+    return best;
+}
+
+bool PuzzleSolver::solveWithActiveCSP(int n)
+{
+    // MINIMAL SENSING: Initialize probe budget (35% of unknown cells)
+    initializeProbeBudget(n, 0.50);
+
+    // TRUE ACTIVE SENSING: Row-by-row with strategic probing BEFORE placement decisions
+    std::vector<std::pair<int, int>> queenPositions;
+    return solveActiveCSPBacktrack(0, n, queenPositions);
+}
+
+// Helper for recursive backtracking with active sensing
+bool PuzzleSolver::solveActiveCSPBacktrack(int row, int n, std::vector<std::pair<int, int>>& queenPositions)
+{
+    if (row == n) {
+        // All queens placed - validate solution
+        return validateFinalSolution(queenPositions);
+    }
+
+    // Track progress
+    if (queenPositions.size() > maxQueensPlaced) {
+        maxQueensPlaced = queenPositions.size();
+        bestPartialSolution = queenPositions;
+    }
+
+    // STEP 1: Get viable positions for this row
+    auto viablePositions = findViableQueenPositions(row, n);
+
+    if (viablePositions.empty()) {
+        return false; // No viable positions, backtrack
+    }
+
+    // STEP 2: STRATEGIC PROBING - probe informative cells BEFORE trying placements
+    // MINIMAL SENSING: Only probe if budget allows!
+    if (canProbe()) {
+        int maxProbesThisRound = std::min(2, (int)viablePositions.size());
+        auto informativeProbes = getMostInformativeProbes(maxProbesThisRound, viablePositions);
+
+        // BUDGET-AWARE PROBING: We're choosing which cells to probe based on information gain
+        for (auto [pr, pc] : informativeProbes) {
+            if (!canProbe()) break;  // Stop if budget exhausted mid-loop
+
+            if (puzzle.getMasked()[pr][pc] == -1) {
+                // Try inference first (free!)
+                int inferredColor = inferWithConfidence(pr, pc);
+                if (inferredColor != -1) {
+                    puzzle.getMasked()[pr][pc] = inferredColor;
+                    inferredCount++;
+                } else {
+                    // Strategic probe
+                    probe(pr, pc);
+                }
+            }
+        }
+    }
+
+    // STEP 3: Propagate constraints after probing
+    propagateConstraints(n);
+
+    // STEP 4: Re-evaluate viable positions with new information
+    viablePositions = findViableQueenPositions(row, n);
+
+    if (viablePositions.empty()) {
+        return false; // Probing revealed this row is unsolvable
+    }
+
+    // STEP 5: Sort positions intelligently
+    std::vector<std::pair<double, std::pair<int, int>>> scoredPositions;
+
+    for (auto [r, c] : viablePositions) {
+        double score = 0.0;
+
+        // Prioritize known colors
+        if (puzzle.getMasked()[r][c] != -1) {
+            score = 1000.0;
+        } else {
+            // Try inference
+            int inferredColor = inferWithConfidence(r, c);
+            if (inferredColor != -1) {
+                score = 500.0;
+            } else {
+                score = calculateProbeValue(r, c, n);
+            }
+        }
+
+        scoredPositions.push_back({score, {r, c}});
+    }
+
+    // Sort descending by score
+    std::sort(scoredPositions.begin(), scoredPositions.end(),
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    // STEP 6: Try placing queen in each viable position
+    // MINIMAL SENSING: Use confidence-based placement when budget exhausted
+    for (auto& [score, pos] : scoredPositions) {
+        int r = pos.first;
+        int c = pos.second;
+
+        int cellColor = puzzle.getMasked()[r][c];
+
+        // If unknown, try to resolve the color
+        if (cellColor == -1) {
+            // Try inference first
+            int inferredColor = inferWithConfidence(r, c);
+            if (inferredColor != -1) {
+                puzzle.getMasked()[r][c] = inferredColor;
+                inferredCount++;
+                cellColor = inferredColor;
+            } else if (canProbe()) {
+                // Probe if budget allows
+                probe(r, c);
+                propagateConstraints(n);
+                cellColor = puzzle.getMasked()[r][c];
+            } else {
+                // Budget exhausted - try confidence-based placement
+                double confidence = 0.0;
+                int predictedColor = getMostLikelyColor(r, c, confidence);
+
+                // Use prediction if confidence is high enough (threshold: 2.0 - lower for more attempts)
+                if (confidence >= 2.0 && predictedColor != -1) {
+                    cellColor = predictedColor;
+                    // Don't update masked matrix - this is a tentative guess
+                    // We'll backtrack if it fails
+                } else {
+                    // Not confident enough - skip this position
+                    continue;
+                }
+            }
+        }
+
+        if (cellColor == -1) continue;  // Still unknown, skip
+
+        // Check color constraint
+        if (hasQueenInColor(cellColor)) continue;
+
+        // Validate all constraints
+        if (isValid(r, c)) {
+            // Place queen
+            puzzle.getCurrentState()[r][c] = 0;
+            queensPlaced++;
+            totalQueensPlaced++;
+            queenPositions.push_back({r, c});
+
+            // Recursively solve next row
+            if (solveActiveCSPBacktrack(row + 1, n, queenPositions)) {
+                return true; // Solution found!
+            }
+
+            // Backtrack
+            undoQueenPlacement(r, c);
+            queenPositions.pop_back();
+        }
+    }
+
+    return false; // No solution from this configuration
+}
+
+// ==================== MINIMAL SENSING: PROBE BUDGET SYSTEM ====================
+
+// Initialize probe budget as a percentage of initially unknown cells
+void PuzzleSolver::initializeProbeBudget(int n, double budgetPercent)
+{
+    // Count initially unknown cells
+    initialUnknownCells = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (puzzle.getMasked()[i][j] == -1) {
+                initialUnknownCells++;
+            }
+        }
+    }
+
+    // Set budget as percentage of unknown cells
+    probeBudget = static_cast<int>(initialUnknownCells * budgetPercent);
+    budgetExhausted = false;
+
+    std::cout << "[MINIMAL SENSING] Probe budget initialized:\n";
+    std::cout << "  Unknown cells: " << initialUnknownCells << "\n";
+    std::cout << "  Budget: " << probeBudget << " probes ("
+              << (budgetPercent * 100) << "% of unknowns)\n";
+}
+
+// Check if we can still probe (budget remaining)
+bool PuzzleSolver::canProbe()
+{
+    if (probeCount >= probeBudget) {
+        budgetExhausted = true;
+        return false;
+    }
+    return true;
+}
+
+// Get most likely color for a cell with confidence score
+int PuzzleSolver::getMostLikelyColor(int row, int col, double& confidence)
+{
+    // This uses the same logic as inferWithConfidence but returns confidence
+    std::map<int, float> colorConfidence;
+    int n = puzzle.getSize();
+
+    // Try all inference techniques and aggregate scores
+    int neighborInfer = inferNeighbours(row, col);
+    if (neighborInfer != -1) {
+        colorConfidence[neighborInfer] += 2.0;
+    }
+
+    int rowColInfer = inferRowColumnUniformity(row, col);
+    if (rowColInfer != -1) {
+        colorConfidence[rowColInfer] += 1.5;
+    }
+
+    int domainInfer = inferFromDomains(row, col);
+    if (domainInfer != -1) {
+        colorConfidence[domainInfer] += 1.0;
+    }
+
+    int contiguityInfer = inferFromContiguity(row, col);
+    if (contiguityInfer != -1) {
+        colorConfidence[contiguityInfer] += 1.5;
+    }
+
+    int patternInfer = inferPatternCompletion(row, col);
+    if (patternInfer != -1) {
+        colorConfidence[patternInfer] += 1.5;
+    }
+
+    // Find color with highest confidence
+    int bestColor = -1;
+    float maxConfidence = 0.0;
+
+    for (auto &[color, conf] : colorConfidence) {
+        if (conf > maxConfidence) {
+            maxConfidence = conf;
+            bestColor = color;
+        }
+    }
+
+    confidence = maxConfidence;
+    return bestColor;
+}
+
+// Try to place queen with incomplete information (confidence-based)
+bool PuzzleSolver::tryPlaceWithConfidence(int row, int col, double minConfidence)
+{
+    double confidence = 0.0;
+    int predictedColor = getMostLikelyColor(row, col, confidence);
+
+    if (confidence >= minConfidence && predictedColor != -1) {
+        // Use predicted color without probing
+        puzzle.getMasked()[row][col] = predictedColor;
+        inferredCount++;
+        return true;
+    }
+
+    return false;  // Not confident enough
 }
