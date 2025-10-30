@@ -87,7 +87,7 @@ void Graph::printGraph(PrintMode mode) const {
     }
     
     int n = getSize();
-    
+    std::cout << "---------------------\n";
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             int value = (*puzzleType)[i][j];
@@ -103,7 +103,7 @@ void Graph::printGraph(PrintMode mode) const {
         }
         std::cout << '\n';
     }
-    std::cout << "---------------------\n";
+    std::cout << "---------------------\n\n";
 }
 
 // const void Graph::printGraph() {

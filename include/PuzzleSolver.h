@@ -37,20 +37,18 @@ private:
     int inferPatternCompletion(int row, int col);
 
 public:
-    static const int directions[4][2]; // Directions for checking diagonals and columns
+    static const int directions[4][2];
 
     int queensPlaced = 0;
     int backtrackCount = 0;
     int probeCount = 0;
     int inferredCount = 0;
-    int totalQueensPlaced = 0;  // Track total queens placed (not decremented on backtrack)
+    int totalQueensPlaced = 0;
 
-    // MINIMAL SENSING: Probe budget system
-    int probeBudget = 0;          // Maximum probes allowed
-    int initialUnknownCells = 0;   // Count of unknown cells at start
-    bool budgetExhausted = false;  // Flag when budget is depleted
+    int probeBudget = 0;
+    int initialUnknownCells = 0;
+    bool budgetExhausted = false;
 
-    // Track best partial solution for failed puzzles
     std::vector<std::pair<int, int>> bestPartialSolution;
     int maxQueensPlaced = 0;
 
@@ -59,38 +57,32 @@ public:
     int inferNeighbours(int row, int col);
     void probe(int row, int col);
     bool isValid(int row, int col);
-    bool solveWithMinimalProbing(int n);
-    bool solveRowWithBacktracking(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
     std::vector<std::pair<int, int>> findViableQueenPositions(int row, int n);
-    bool needsProbeForDecision(int row, int col);
     void undoQueenPlacement(int row, int col);
     void printStatistics();
     void verifyQueenPlacement();
 
-    // Active sensing methods
     double calculateProbeValue(int row, int col, int n);
     void performInferenceCascade(int n);
     int countUnknownNeighbors(int row, int col, int n);
     bool hasQueenInColor(int color);
     bool validateFinalSolution(std::vector<std::pair<int, int>>& queenPositions);
     void restoreBestPartialSolution();
-    void strategicSeedProbing(int n);
 
-    // TRUE ACTIVE SENSING - Core methods
-    bool solveWithActiveCSP(int n);  // New CSP solver with active sensing
+    bool solvePuzzle(int n);
     bool solveActiveCSPBacktrack(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
     std::vector<std::pair<int, int>> getMostInformativeProbes(int k, std::vector<std::pair<int, int>>& viablePositions);
     double calculateExpectedInformationGain(int row, int col, int n);
     void propagateConstraints(int n);
-    std::pair<int, int> selectMostConstrainedVariable(std::set<std::pair<int, int>>& unassigned);
-    std::vector<std::pair<int, int>> getViablePositionsForCell(int row, int col, int n);
-    int countViablePositions(int row, int col, int n);
 
-    // MINIMAL SENSING - Budget management
-    void initializeProbeBudget(int n, double budgetPercent = 0.15);  // Set budget as % of unknown cells
-    bool canProbe();  // Check if budget allows probing
-    int getMostLikelyColor(int row, int col, double& confidence);  // Get color with confidence score
-    bool tryPlaceWithConfidence(int row, int col, double minConfidence);  // Try placement with incomplete info
+    void initializeProbeBudget(int n, double budgetPercent = 0.15);
+    bool canProbe();
+    int getMostLikelyColor(int row, int col, double& confidence);
+
+    static std::map<int, std::vector<std::pair<int, int>>> loadSolutions(const std::string& filename);
+    static std::map<int, std::vector<std::string>> loadVisualSolutions(const std::string& filename);
+    double compareWithGroundTruth(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
+    void printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
 };
 
 #endif
