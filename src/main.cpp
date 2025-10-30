@@ -14,8 +14,8 @@ int main()
     PuzzleManager::loadFromFile(puzzleFileName, numPuzzles, graphs);
 
     // Load solutions to verify PuzzleSolver results 
-    auto solutions = PuzzleSolver::loadSolutions("solutions.txt");
-    auto visualSolutions = PuzzleSolver::loadVisualSolutions("solutions_board.txt");
+    auto solutionsPos = PuzzleSolver::loadSolutions("solutions.txt");
+    auto solutionBoards = PuzzleSolver::loadVisualSolutions("solutions_board.txt");
 
     int solvedCount = 0;
     int puzzleNumber = 1;
@@ -46,9 +46,9 @@ int main()
             std::cout << "Current State of failed board (queens placed so far):\n";
             g.printGraph(g.CURRENT_SYMBOLS);
             
-            if (visualSolutions.find(puzzleNumber) != visualSolutions.end()) {
+            if (solutionBoards.find(puzzleNumber) != solutionBoards.end()) {
                 std::cout << "Correct Solution Board:\n";
-                for (const auto& row : visualSolutions[puzzleNumber]) {
+                for (const auto& row : solutionBoards[puzzleNumber]) {
                     std::cout << row << std::endl;
                 }
             }
@@ -57,24 +57,22 @@ int main()
         else
         {
             std::cout << "✅ PUZZLE " << puzzleNumber << " - Solution found!\n";
-            solvedCount++;
-
-
             std::cout << "Current:\n";
             g.printGraph(g.CURRENT_SYMBOLS);
             std::cout << "Final Masked:\n";
             g.printGraph(g.MASKED);
 
-            solver.verifyQueenPlacement();
+            solvedCount++;
         }
+
         solver.printStatistics();
 
-        // Compare with ground truth (for both solved and failed)
-        if (solutions.find(puzzleNumber) != solutions.end()) {
-            auto& groundTruth = solutions[puzzleNumber];
-            solver.printCorrectnessReport(puzzleNumber, groundTruth);
+        // Compare with correct solution (for both solved and failed)
+        if (solutionsPos.find(puzzleNumber) != solutionsPos.end()) {
+            auto& correctPositions = solutionsPos[puzzleNumber];
+            solver.printCorrectnessReport(puzzleNumber, correctPositions);
 
-            double correctness = solver.compareWithGroundTruth(puzzleNumber, groundTruth);
+            double correctness = solver.compareToCorrectPositions(puzzleNumber, correctPositions);
             totalCorrectness += correctness;
             totalPuzzles++;
 
@@ -82,22 +80,18 @@ int main()
         }
 
         puzzleNumber++;
-
-        // if (!g.solvePuzzle(0, g.getSize())) {
-        //     std::cout << "No solution found.\n";
-        // }
     }
 
-    std::cout << "\n======= FINAL RESULTS =======" << std::endl;
-    std::cout << "Solved: " << solvedCount << "/" << numPuzzles << " puzzles" << std::endl;
-    std::cout << "Success rate: " << (100.0 * solvedCount / numPuzzles) << "%" << std::endl;
+    std::cout << "\n[ FINAL RESULTS ]\n";
+    std::cout << "Solved: " << solvedCount << "/" << numPuzzles << " puzzles\n";
+    std::cout << "Success rate: " << (100.0 * solvedCount / numPuzzles) << "%\n";
 
     if (totalPuzzles > 0) {
         double avgCorrectness = totalCorrectness / totalPuzzles * 100.0;
-        std::cout << "\n======= CORRECTNESS ANALYSIS =======" << std::endl;
-        std::cout << "Average correctness: " << avgCorrectness << "%" << std::endl;
-        std::cout << "Total correct placements: " << (int)(totalCorrectness) << " / " << totalPuzzles << " puzzles" << std::endl;
-        std::cout << "(Includes both successful and failed attempts)" << std::endl;
+        std::cout << "\n[ CORRECTNESS ANALYSIS ]\n";
+        std::cout << "Average correctness: " << avgCorrectness << "%\n";
+        std::cout << "Total correct placements: " << (int)(totalCorrectness) << " / " << totalPuzzles << " puzzles\n";
+        std::cout << "(Includes both successful and failed attempts)\n";
     }
 
     // Explicitly clear the graphs vector to avoid cleanup issues with large datasets

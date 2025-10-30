@@ -157,17 +157,17 @@ void PuzzleSolver::computeColorDomains(std::map<int, ColorDomain> &domains)
 {
     int n = puzzle.getOriginal().size();
 
-    for (int r = 0; r < n; r++)
+    for (int row = 0; row < n; row++)
     {
-        for (int c = 0; c < n; c++)
+        for (int col = 0; col < n; col++)
         {
-            int color = puzzle.getMasked()[r][c];
+            int color = puzzle.getMasked()[row][col];
             if (color != -1)
             {
-                domains[color].minRow = std::min(domains[color].minRow, r);
-                domains[color].maxRow = std::max(domains[color].maxRow, r);
-                domains[color].minCol = std::min(domains[color].minCol, c);
-                domains[color].maxCol = std::max(domains[color].maxCol, c);
+                domains[color].minRow = std::min(domains[color].minRow, row);
+                domains[color].maxRow = std::max(domains[color].maxRow, row);
+                domains[color].minCol = std::min(domains[color].minCol, col);
+                domains[color].maxCol = std::max(domains[color].maxCol, col);
             }
         }
     }
@@ -320,16 +320,16 @@ void PuzzleSolver::performInferenceCascade(int n)
         madeProgress = false;
         passes++;
 
-        for (int r = 0; r < n; r++)
+        for (int row = 0; row < n; row++)
         {
-            for (int c = 0; c < n; c++)
+            for (int col = 0; col < n; col++)
             {
-                if (puzzle.getMasked()[r][c] == -1)
+                if (puzzle.getMasked()[row][col] == -1)
                 {
-                    int inferredColor = inferWithConfidence(r, c);
+                    int inferredColor = inferWithConfidence(row, col);
                     if (inferredColor != -1)
                     {
-                        puzzle.getMasked()[r][c] = inferredColor;
+                        puzzle.getMasked()[row][col] = inferredColor;
                         inferredCount++;
                         madeProgress = true;
                     }
@@ -342,13 +342,13 @@ void PuzzleSolver::performInferenceCascade(int n)
 bool PuzzleSolver::hasQueenInColor(int color)
 {
     int n = puzzle.getOriginal().size();
-    for (int r = 0; r < n; r++)
+    for (int row = 0; row < n; row++)
     {
-        for (int c = 0; c < n; c++)
+        for (int col = 0; col < n; col++)
         {
-            if (puzzle.getCurrentState()[r][c] == 0)
+            if (puzzle.getCurrentState()[row][col] == 0)
             {
-                int queenColor = puzzle.getMasked()[r][c];
+                int queenColor = puzzle.getMasked()[row][col];
                 if (queenColor == color)
                 {
                     return true;
@@ -363,9 +363,9 @@ bool PuzzleSolver::validateFinalSolution(std::vector<std::pair<int, int>>& queen
 {
     int n = puzzle.getOriginal().size();
 
-    for (auto [r, c] : queenPositions) {
-        if (puzzle.getMasked()[r][c] == -1) {
-            probe(r, c);
+    for (auto [row, col] : queenPositions) {
+        if (puzzle.getMasked()[row][col] == -1) {
+            probe(row, col);
         }
     }
 
@@ -442,100 +442,43 @@ bool PuzzleSolver::isValid(int row, int col)
 
 void PuzzleSolver::printStatistics()
 {
-    std::cout << "\n=== MINIMAL SENSING Statistics ===" << std::endl;
-    std::cout << "Final queens placed: " << queensPlaced << std::endl;
-    std::cout << "Total placement attempts: " << totalQueensPlaced << std::endl;
-    std::cout << "Backtracks: " << backtrackCount << std::endl;
+    std::cout << "\n\n[ Solver Statistics ]\n";
+
+    std::cout << "\n--- CSP Backtracking ---" << std::endl;
+    std::cout << "Final queens placed: " << queensPlaced << '\n';
+    std::cout << "Total Queen placement attempts: " << totalQueensPlaced << '\n';
+    std::cout << "Backtracks: " << backtrackCount << '\n';
+
+    std::cout << "\n---Robot Sensing Operations ---\n";
+    std::cout << "Initial unknown cells: " << initialUnknownCells << '\n';
+    std::cout << "Probe operations: " << probeCount << '\n';
+    std::cout << "Inferred operations: " << inferredCount << '\n';
+    
+    int totalRevealed = probeCount + inferredCount;
+    double revealPercentage = (double)totalRevealed / initialUnknownCells * 100.0;
+    std::cout << "Total cells revealed: " << totalRevealed << " / " << initialUnknownCells << " (" << revealPercentage << "%)" << '\n';
+    std::cout << "Cells still unknown: " << (initialUnknownCells - totalRevealed) << " (" << (100.0 - revealPercentage) << "%)" << '\n';
 
     if (probeBudget > 0) {
-        std::cout << "\n--- Probe Budget ---" << std::endl;
-        std::cout << "Initially unknown cells: " << initialUnknownCells << std::endl;
-        std::cout << "Probe budget: " << probeBudget << " ("
-                  << (double)probeBudget/initialUnknownCells*100 << "% of unknowns)" << std::endl;
+        std::cout << "\n--- Probe Budget ---\n";
+        std::cout << "Probe budget: " << probeBudget << " ("<< (double)probeBudget/initialUnknownCells*100 << "% of unknowns)" << '\n';
         std::cout << "Probes used: " << probeCount << " / " << probeBudget;
         if (budgetExhausted) {
-            std::cout << " (BUDGET EXHAUSTED)";
+            std::cout << " (BUDGET FULLY USED)";
         }
-        std::cout << std::endl;
-        std::cout << "Budget remaining: " << (probeBudget - probeCount) << std::endl;
+        std::cout << '\n';
+        std::cout << "Budget remaining: " << (probeBudget - probeCount) << '\n';
 
-        int totalRevealed = probeCount + inferredCount;
-        double revelationPercent = (double)totalRevealed / initialUnknownCells * 100.0;
-        std::cout << "Total cells revealed: " << totalRevealed << " / " << initialUnknownCells
-                  << " (" << revelationPercent << "%)" << std::endl;
-        std::cout << "Cells still unknown: " << (initialUnknownCells - totalRevealed)
-                  << " (" << (100.0 - revelationPercent) << "%)" << std::endl;
+
     }
 
-    std::cout << "\n--- Sensing Operations ---" << std::endl;
-    std::cout << "Probe operations: " << probeCount << std::endl;
-    std::cout << "Inferred operations: " << inferredCount << std::endl;
-
-    double efficiency = (double)queensPlaced / (totalQueensPlaced + 1);
+    double activeSensingRatio = (double)probeCount / (inferredCount + probeCount + 1);
     double inferenceRatio = (double)inferredCount / (inferredCount + probeCount + 1);
 
-    std::cout << "\n--- Efficiency Metrics ---" << std::endl;
-    std::cout << "Search efficiency: " << efficiency << " (final queens / total attempts)" << std::endl;
-    std::cout << "Inference ratio: " << inferenceRatio << " (inferred / total sensing)" << std::endl;
-    std::cout << "Total operations: " << (totalQueensPlaced + backtrackCount + probeCount + inferredCount) << std::endl;
-}
-
-void PuzzleSolver::verifyQueenPlacement()
-{
-    int n = puzzle.getOriginal().size();
-    std::vector<std::pair<int, int>> queensPositions;
-
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getCurrentState()[r][c] == 0) {
-                queensPositions.push_back({r, c});
-            }
-        }
-    }
-
-    std::cout << "\n=== QUEEN PLACEMENT VERIFICATION ===" << std::endl;
-    std::cout << "Found " << queensPositions.size() << " queens (should be " << n << ")" << std::endl;
-
-    if (queensPositions.size() != n) {
-        std::cout << "WRONG NUMBER OF QUEENS!" << std::endl;
-        return;
-    }
-
-    bool hasViolations = false;
-    for (auto [r, c] : queensPositions) {
-        int queenColor = puzzle.getMasked()[r][c];
-        std::cout << "Queen at (" << r << "," << c << ") in color " << queenColor << std::endl;
-
-        for (auto [r2, c2] : queensPositions) {
-            if (r2 != r || c2 != c) {
-                if (puzzle.getMasked()[r2][c2] == queenColor) {
-                    std::cout << "VIOLATION: Multiple queens in same color " << queenColor
-                             << " at (" << r << "," << c << ") and (" << r2 << "," << c2 << ")" << std::endl;
-                    hasViolations = true;
-                }
-
-                if (c2 == c) {
-                    std::cout << "VIOLATION: Multiple queens in same column " << c
-                             << " at (" << r << "," << c << ") and (" << r2 << "," << c2 << ")" << std::endl;
-                    hasViolations = true;
-                }
-
-                if (abs(r2 - r) == 1 && abs(c2 - c) == 1) {
-                    std::cout << "VIOLATION: Queens diagonally adjacent (" << r << "," << c
-                             << ") and (" << r2 << "," << c2 << ")" << std::endl;
-                    hasViolations = true;
-                }
-            }
-        }
-    }
-
-    if (hasViolations) {
-        std::cout << "SOLUTION HAS CONSTRAINT VIOLATIONS!" << std::endl;
-    } else {
-        std::cout << "All constraints satisfied" << std::endl;
-    }
-
-    std::cout << "Verification complete" << std::endl;
+    std::cout << "\n--- Efficiency Metrics ---\n";
+    std::cout << "Active Sensing ratio: " << activeSensingRatio << " (probeCount / total sensing)\n";
+    std::cout << "Inference ratio: " << inferenceRatio << " (inferred / total sensing)\n";
+    std::cout << "Total operations: " << (totalQueensPlaced + backtrackCount + probeCount + inferredCount) << '\n';
 }
 
 std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row, int n)
@@ -545,6 +488,7 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
     for (int col = 0; col < n; col++) {
         bool basicConstraintsOK = true;
 
+        // Check if any queen already exists in this column
         for (int r = 0; r < row; r++) {
             if (puzzle.getCurrentState()[r][col] == 0) {
                 basicConstraintsOK = false;
@@ -552,6 +496,7 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
             }
         }
 
+        // Check for queens on diagonals
         if (basicConstraintsOK) {
             for (int r = 0; r < row; r++) {
                 for (int c = 0; c < n; c++) {
@@ -566,6 +511,7 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
             }
         }
 
+        // Infer or verify cell color
         if (basicConstraintsOK) {
             int cellColor = puzzle.getMasked()[row][col];
 
@@ -578,6 +524,7 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
                 }
             }
 
+            // Check if this color is already used by another queen
             if (cellColor != -1) {
                 if (hasQueenInColor(cellColor)) {
                     basicConstraintsOK = false;
@@ -585,6 +532,7 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
             }
         }
 
+        // Add position if all constraints pass
         if (basicConstraintsOK) {
             viablePositions.push_back({row, col});
         }
@@ -604,14 +552,14 @@ void PuzzleSolver::restoreBestPartialSolution()
 {
     int n = puzzle.getOriginal().size();
 
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            puzzle.getCurrentState()[r][c] = puzzle.getMasked()[r][c];
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            puzzle.getCurrentState()[row][col] = puzzle.getMasked()[row][col];
         }
     }
 
-    for (auto [r, c] : bestPartialSolution) {
-        puzzle.getCurrentState()[r][c] = 0;
+    for (auto [row, col] : bestPartialSolution) {
+        puzzle.getCurrentState()[row][col] = 0;
     }
 }
 
@@ -650,14 +598,14 @@ std::vector<std::pair<int, int>> PuzzleSolver::getMostInformativeProbes(
 
     std::set<std::pair<int, int>> candidates;
 
-    for (auto [r, c] : viablePositions) {
-        if (puzzle.getMasked()[r][c] == -1) {
-            candidates.insert({r, c});
+    for (auto [row, col] : viablePositions) {
+        if (puzzle.getMasked()[row][col] == -1) {
+            candidates.insert({row, col});
         }
 
         for (int i = 0; i < 4; i++) {
-            int nr = r + directions[i][0];
-            int nc = c + directions[i][1];
+            int nr = row + directions[i][0];
+            int nc = col + directions[i][1];
             if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
                 if (puzzle.getMasked()[nr][nc] == -1) {
                     candidates.insert({nr, nc});
@@ -666,9 +614,9 @@ std::vector<std::pair<int, int>> PuzzleSolver::getMostInformativeProbes(
         }
     }
 
-    for (auto [r, c] : candidates) {
-        double gain = calculateExpectedInformationGain(r, c, n);
-        scoredProbes.push_back({gain, {r, c}});
+    for (auto [row, col] : candidates) {
+        double gain = calculateExpectedInformationGain(row, col, n);
+        scoredProbes.push_back({gain, {row, col}});
     }
 
     std::sort(scoredProbes.begin(), scoredProbes.end(),
@@ -689,13 +637,13 @@ void PuzzleSolver::propagateConstraints(int n)
 
 bool PuzzleSolver::solvePuzzle(int n)
 {
-    initializeProbeBudget(n, 1);
+    setProbeBudget(n, 0.3);
 
     bestPartialSolution.clear();
     maxQueensPlaced = 0;
 
     std::vector<std::pair<int, int>> queenPositions;
-    bool solved = solveActiveCSPBacktrack(0, n, queenPositions);
+    bool solved = mainSolver(0, n, queenPositions);
 
     if (!solved && !bestPartialSolution.empty()) {
         restoreBestPartialSolution();
@@ -704,7 +652,7 @@ bool PuzzleSolver::solvePuzzle(int n)
     return solved;
 }
 
-bool PuzzleSolver::solveActiveCSPBacktrack(int row, int n, std::vector<std::pair<int, int>>& queenPositions)
+bool PuzzleSolver::mainSolver(int row, int n, std::vector<std::pair<int, int>>& queenPositions)
 {
     if (row == n) {
         return validateFinalSolution(queenPositions);
@@ -750,45 +698,45 @@ bool PuzzleSolver::solveActiveCSPBacktrack(int row, int n, std::vector<std::pair
 
     std::vector<std::pair<double, std::pair<int, int>>> scoredPositions;
 
-    for (auto [r, c] : viablePositions) {
+    for (auto [row, col] : viablePositions) {
         double score = 0.0;
 
-        if (puzzle.getMasked()[r][c] != -1) {
+        if (puzzle.getMasked()[row][col] != -1) {
             score = 1000.0;
         } else {
-            int inferredColor = inferWithConfidence(r, c);
+            int inferredColor = inferWithConfidence(row, col);
             if (inferredColor != -1) {
                 score = 500.0;
             } else {
-                score = calculateProbeValue(r, c, n);
+                score = calculateProbeValue(row, col, n);
             }
         }
 
-        scoredPositions.push_back({score, {r, c}});
+        scoredPositions.push_back({score, {row, col}});
     }
 
     std::sort(scoredPositions.begin(), scoredPositions.end(),
               [](const auto& a, const auto& b) { return a.first > b.first; });
 
     for (auto& [score, pos] : scoredPositions) {
-        int r = pos.first;
-        int c = pos.second;
+        int row = pos.first;
+        int col = pos.second;
 
-        int cellColor = puzzle.getMasked()[r][c];
+        int cellColor = puzzle.getMasked()[row][col];
 
         if (cellColor == -1) {
-            int inferredColor = inferWithConfidence(r, c);
+            int inferredColor = inferWithConfidence(row, col);
             if (inferredColor != -1) {
-                puzzle.getMasked()[r][c] = inferredColor;
+                puzzle.getMasked()[row][col] = inferredColor;
                 inferredCount++;
                 cellColor = inferredColor;
             } else if (canProbe()) {
-                probe(r, c);
+                probe(row, col);
                 propagateConstraints(n);
-                cellColor = puzzle.getMasked()[r][c];
+                cellColor = puzzle.getMasked()[row][col];
             } else {
                 double confidence = 0.0;
-                int predictedColor = getMostLikelyColor(r, c, confidence);
+                int predictedColor = getMostLikelyColor(row, col, confidence);
 
                 if (confidence >= 2.0 && predictedColor != -1) {
                     cellColor = predictedColor;
@@ -802,17 +750,17 @@ bool PuzzleSolver::solveActiveCSPBacktrack(int row, int n, std::vector<std::pair
 
         if (hasQueenInColor(cellColor)) continue;
 
-        if (isValid(r, c)) {
-            puzzle.getCurrentState()[r][c] = 0;
+        if (isValid(row, col)) {
+            puzzle.getCurrentState()[row][col] = 0;
             queensPlaced++;
             totalQueensPlaced++;
-            queenPositions.push_back({r, c});
+            queenPositions.push_back({row, col});
 
-            if (solveActiveCSPBacktrack(row + 1, n, queenPositions)) {
+            if (mainSolver(row + 1, n, queenPositions)) {
                 return true;
             }
 
-            undoQueenPlacement(r, c);
+            undoQueenPlacement(row, col);
             queenPositions.pop_back();
         }
     }
@@ -820,9 +768,10 @@ bool PuzzleSolver::solveActiveCSPBacktrack(int row, int n, std::vector<std::pair
     return false;
 }
 
-void PuzzleSolver::initializeProbeBudget(int n, double budgetPercent)
+void PuzzleSolver::setProbeBudget(int n, double budgetPercent)
 {
     initialUnknownCells = 0;
+    // Loop through each square to count how many are unknown (masked) 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (puzzle.getMasked()[i][j] == -1) {
@@ -830,14 +779,8 @@ void PuzzleSolver::initializeProbeBudget(int n, double budgetPercent)
             }
         }
     }
-
     probeBudget = static_cast<int>(initialUnknownCells * budgetPercent);
     budgetExhausted = false;
-
-    std::cout << "[MINIMAL SENSING] Probe budget initialized:\n";
-    std::cout << "  Unknown cells: " << initialUnknownCells << "\n";
-    std::cout << "  Budget: " << probeBudget << " probes ("
-              << (budgetPercent * 100) << "% of unknowns)\n";
 }
 
 bool PuzzleSolver::canProbe()
@@ -978,56 +921,56 @@ std::map<int, std::vector<std::string>> PuzzleSolver::loadVisualSolutions(const 
     return visualSolutions;
 }
 
-double PuzzleSolver::compareWithGroundTruth(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth)
+double PuzzleSolver::compareToCorrectPositions(int puzzleNumber, const std::vector<std::pair<int, int>>& correctPositions)
 {
-    if (groundTruth.empty()) {
+    if (correctPositions.empty()) {
         return 0.0;
     }
 
     int n = puzzle.getSize();
-    std::set<std::pair<int, int>> groundTruthSet(groundTruth.begin(), groundTruth.end());
+    std::set<std::pair<int, int>> correctPositionsSet(correctPositions.begin(), correctPositions.end());
     std::set<std::pair<int, int>> currentQueens;
 
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getCurrentState()[r][c] == 0) {
-                currentQueens.insert({r, c});
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            if (puzzle.getCurrentState()[row][col] == 0) {
+                currentQueens.insert({row, col});
             }
         }
     }
 
-    int correctPositions = 0;
+    int totalCorrect = 0;
     for (const auto& pos : currentQueens) {
-        if (groundTruthSet.find(pos) != groundTruthSet.end()) {
-            correctPositions++;
+        if (correctPositionsSet.find(pos) != correctPositionsSet.end()) {
+            totalCorrect++;
         }
     }
 
-    if (currentQueens.size() == groundTruthSet.size() &&
+    if (currentQueens.size() == correctPositionsSet.size() &&
         std::all_of(currentQueens.begin(), currentQueens.end(), [&](const std::pair<int,int>& p){
-            return groundTruthSet.find(p) != groundTruthSet.end();
+            return correctPositionsSet.find(p) != correctPositionsSet.end();
         })) {
         return 1.0;
     }
 
-    return (double)correctPositions / groundTruth.size();
+    return (double)totalCorrect / correctPositions.size();
 }
 
-void PuzzleSolver::printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth)
+void PuzzleSolver::printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& correctPositions)
 {
-    if (groundTruth.empty()) {
-        std::cout << "\nNo ground truth solution available for comparison" << std::endl;
+    if (correctPositions.empty()) {
+        std::cout << "\nNo correct solutions available for comparison\n";
         return;
     }
 
     int n = puzzle.getSize();
-    std::set<std::pair<int, int>> groundTruthSet(groundTruth.begin(), groundTruth.end());
-    std::vector<std::pair<int, int>> currentQueens;
+    std::set<std::pair<int, int>> correctPositionsSet(correctPositions.begin(), correctPositions.end());
+    std::vector<std::pair<int, int>> currentQueenPositions;
 
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (puzzle.getCurrentState()[r][c] == 0) {
-                currentQueens.push_back({r, c});
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            if (puzzle.getCurrentState()[row][col] == 0) {
+                currentQueenPositions.push_back({row, col});
             }
         }
     }
@@ -1036,65 +979,66 @@ void PuzzleSolver::printCorrectnessReport(int puzzleNumber, const std::vector<st
     std::vector<std::pair<int, int>> incorrect;
     std::vector<std::pair<int, int>> missing;
 
-    for (const auto& pos : currentQueens) {
-        if (groundTruthSet.find(pos) != groundTruthSet.end()) {
+    for (const auto& pos : currentQueenPositions) {
+        if (correctPositionsSet.find(pos) != correctPositionsSet.end()) {
             correct.push_back(pos);
         } else {
             incorrect.push_back(pos);
         }
     }
 
-    for (const auto& pos : groundTruth) {
-        if (std::find(currentQueens.begin(), currentQueens.end(), pos) == currentQueens.end()) {
+    for (const auto& pos : correctPositions) {
+        if (std::find(currentQueenPositions.begin(), currentQueenPositions.end(), pos) == currentQueenPositions.end()) {
             missing.push_back(pos);
         }
     }
 
-    double correctPercent = (double)correct.size() / groundTruth.size() * 100.0;
+    double correctPercent = (double)correct.size() / correctPositions.size() * 100.0;
 
-    std::cout << "\n=== GROUND TRUTH COMPARISON ===" << std::endl;
-    std::cout << "Expected queens: " << groundTruth.size() << std::endl;
-    std::cout << "Placed queens: " << currentQueens.size() << std::endl;
-    std::cout << "Correct positions: " << correct.size() << " / " << groundTruth.size()
-              << " (" << correctPercent << "%)" << std::endl;
+    std::cout << "\n\n[Solver vs Solution]\n";
 
-    bool exactMatch = (currentQueens.size() == groundTruthSet.size());
+    std::cout << "--- Comparison ---\n";
+    std::cout << "Expected queens: " << correctPositions.size() << std::endl;
+    std::cout << "Placed queens: " << currentQueenPositions.size() << std::endl;
+    std::cout << "Correct positions: " << correct.size() << " / " << correctPositions.size() << " (" << correctPercent << "%)\n";
+
+    bool exactMatch = (currentQueenPositions.size() == correctPositionsSet.size());
     if (exactMatch) {
-        for (const auto &p : currentQueens) {
-            if (groundTruthSet.find(p) == groundTruthSet.end()) {
+        for (const auto &p : currentQueenPositions) {
+            if (correctPositionsSet.find(p) == correctPositionsSet.end()) {
                 exactMatch = false;
                 break;
             }
         }
     }
 
-    std::cout << "Exact positional match: " << (exactMatch ? "YES" : "NO") << std::endl;
+    std::cout << "Exact positional match: " << (exactMatch ? "YES" : "NO") << '\n';
 
     if (!correct.empty()) {
-        std::cout << "Correct: ";
-        for (const auto& [r, c] : correct) {
-            std::cout << "(" << r << "," << c << ") ";
+        std::cout << "\nCorrect: ";
+        for (const auto& [row, col] : correct) {
+            std::cout << "(" << row << "," << col << ") ";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 
     if (!incorrect.empty()) {
         std::cout << "Incorrect: ";
-        for (const auto& [r, c] : incorrect) {
-            std::cout << "(" << r << "," << c << ") ";
+        for (const auto& [row, col] : incorrect) {
+            std::cout << "(" << row << "," << col << ") ";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 
     if (!missing.empty()) {
         std::cout << "Missing: ";
-        for (const auto& [r, c] : missing) {
-            std::cout << "(" << r << "," << c << ") ";
+        for (const auto& [row, col] : missing) {
+            std::cout << "(" << row << "," << col << ") ";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 
     if (correctPercent == 100.0) {
-        std::cout << "PERFECT MATCH!" << std::endl;
+        std::cout << "\nSolver solution is correct\n";
     }
 }

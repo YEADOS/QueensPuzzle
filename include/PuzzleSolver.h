@@ -60,7 +60,6 @@ public:
     std::vector<std::pair<int, int>> findViableQueenPositions(int row, int n);
     void undoQueenPlacement(int row, int col);
     void printStatistics();
-    void verifyQueenPlacement();
 
     double calculateProbeValue(int row, int col, int n);
     void performInferenceCascade(int n);
@@ -70,18 +69,18 @@ public:
     void restoreBestPartialSolution();
 
     bool solvePuzzle(int n);
-    bool solveActiveCSPBacktrack(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
+    bool mainSolver(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
     std::vector<std::pair<int, int>> getMostInformativeProbes(int k, std::vector<std::pair<int, int>>& viablePositions);
     double calculateExpectedInformationGain(int row, int col, int n);
     void propagateConstraints(int n);
 
-    void initializeProbeBudget(int n, double budgetPercent = 0.15);
+    void setProbeBudget(int n, double budgetPercent = 0.15);
     bool canProbe();
     int getMostLikelyColor(int row, int col, double& confidence);
 
     static std::map<int, std::vector<std::pair<int, int>>> loadSolutions(const std::string& filename);
     static std::map<int, std::vector<std::string>> loadVisualSolutions(const std::string& filename);
-    double compareWithGroundTruth(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
+    double compareToCorrectPositions(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
     void printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
 };
 
