@@ -16,7 +16,7 @@ private:
     std::vector<std::pair<int, int>> solution;  // Queen positions
 
     bool isValid(int row, int col) {
-        int cellColor = puzzle.getOriginal()[row][col];
+        int cellColour = puzzle.getOriginal()[row][col];
 
         // Check if another queen already placed in same column
         for (int r = 0; r < n; r++) {
@@ -37,12 +37,12 @@ private:
             }
         }
 
-        // Check color constraint: no other queen in same color region
+        // Check colour constraint: no other queen in same colour region
         for (int r = 0; r < n; r++) {
             for (int c = 0; c < n; c++) {
                 if (board[r][c] == 1) {
-                    if (puzzle.getOriginal()[r][c] == cellColor) {
-                        return false;  // Another queen in same color
+                    if (puzzle.getOriginal()[r][c] == cellColour) {
+                        return false;  // Another queen in same colour
                     }
                 }
             }

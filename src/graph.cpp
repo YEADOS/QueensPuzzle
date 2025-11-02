@@ -162,26 +162,26 @@ std::vector<std::vector<int>> Graph::createSmartMaskedMatrix(const std::vector<s
     int n = original.size();
 
     // Step 1: Count cells for each color
-    std::map<int, int> colorCounts;
-    std::map<int, std::vector<std::pair<int, int>>> colorPositions;
+    std::map<int, int> colourCounts;
+    std::map<int, std::vector<std::pair<int, int>>> colourPositions;
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            int color = original[i][j];
-            colorCounts[color]++;
-            colorPositions[color].push_back({i, j});
+            int colour = original[i][j];
+            colourCounts[colour]++;
+            colourPositions[colour].push_back({i, j});
         }
     }
 
     // Step 2: Identify single-cell colored sections (don't mask these)
     std::set<std::pair<int, int>> preservePositions;
-    for (auto& [color, count] : colorCounts) {
+    for (auto& [colour, count] : colourCounts) {
         if (count == 1) {
-            // Preserve single-cell colors
-            preservePositions.insert(colorPositions[color][0]);
-            std::cout << "Preserving single-cell color " << color
-                     << " at (" << colorPositions[color][0].first
-                     << "," << colorPositions[color][0].second << ")\n";
+            // Preserve single-cell colours
+            preservePositions.insert(colourPositions[colour][0]);
+            std::cout << "Preserving single-cell colour " << colour
+                     << " at (" << colourPositions[colour][0].first
+                     << "," << colourPositions[colour][0].second << ")\n";
         }
     }
 
@@ -192,15 +192,15 @@ std::vector<std::vector<int>> Graph::createSmartMaskedMatrix(const std::vector<s
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            // Never mask single-cell colors
+            // Never mask single-cell colours
             if (preservePositions.count({i, j})) {
                 continue;
             }
 
-            int color = original[i][j];
+            int colour = original[i][j];
 
-            // For colors with few cells (2-3), mask more conservatively
-            if (colorCounts[color] <= 3) {
+            // For colours with few cells (2-3), mask more conservatively
+            if (colourCounts[colour] <= 3) {
                 std::bernoulli_distribution conservativeMask(mask_prob * 0.5);
                 if (conservativeMask(gen)) {
                     masked[i][j] = -1;
@@ -220,8 +220,8 @@ std::vector<std::vector<int>> Graph::createSmartMaskedMatrix(const std::vector<s
         }
     }
 
-    // Step 4: Ensure each color has at least one visible cell for inference
-    for (auto& [color, positions] : colorPositions) {
+    // Step 4: Ensure each colour has at least one visible cell for inference
+    for (auto& [colour, positions] : colourPositions) {
         bool hasVisible = false;
         for (auto& pos : positions) {
             if (masked[pos.first][pos.second] != -1) {
@@ -230,12 +230,12 @@ std::vector<std::vector<int>> Graph::createSmartMaskedMatrix(const std::vector<s
             }
         }
 
-        // If all cells of a color are masked, reveal at least one
+        // If all cells of a colour are masked, reveal at least one
         if (!hasVisible && !positions.empty()) {
             int revealIdx = gen() % positions.size();
             auto revealPos = positions[revealIdx];
-            masked[revealPos.first][revealPos.second] = color;
-            std::cout << "Revealing at least one cell of color " << color
+            masked[revealPos.first][revealPos.second] = colour;
+            std::cout << "Revealing at least one cell of colour " << colour
                      << " at (" << revealPos.first << "," << revealPos.second << ")\n";
         }
     }

@@ -12,7 +12,7 @@
 #include <climits>
 #include <map>
 
-struct ColorDomain
+struct ColourDomain
 {
     int minRow = INT_MAX, maxRow = -1;
     int minCol = INT_MAX, maxCol = -1;
@@ -29,8 +29,8 @@ class PuzzleSolver
 
 private:
     Graph &puzzle;
-    void computeColorDomains(std::map<int, ColorDomain> &domains);
-    int inferWithConfidence(int row, int col);
+    void computeColourDomains(std::map<int, ColourDomain> &domains);
+    int inferStrict(int row, int col);
     int inferFromContiguity(int row, int col);
     int inferFromDomains(int row, int col);
     int inferRowColumnUniformity(int row, int col);
@@ -63,20 +63,20 @@ public:
 
     double calculateProbeValue(int row, int col, int n);
     void performInferenceCascade(int n);
-    int countUnknownNeighbors(int row, int col, int n);
-    bool hasQueenInColor(int color);
+    int countUnknownNeighbours(int row, int col, int n);
+    bool hasQueenInColour(int colour);
     bool validateFinalSolution(std::vector<std::pair<int, int>>& queenPositions);
     void restoreBestPartialSolution();
 
     bool solvePuzzle(int n);
     bool mainSolver(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
-    std::vector<std::pair<int, int>> getMostInformativeProbes(int k, std::vector<std::pair<int, int>>& viablePositions);
+    std::vector<std::pair<int, int>> findBestProbeSpots(int k, std::vector<std::pair<int, int>>& viablePositions);
     double calculateExpectedInformationGain(int row, int col, int n);
     void propagateConstraints(int n);
 
     void setProbeBudget(int n, double budgetPercent = 0.15);
     bool canProbe();
-    int getMostLikelyColor(int row, int col, double& confidence);
+    int inferWeak(int row, int col, double& confidence);
 
     static std::map<int, std::vector<std::pair<int, int>>> loadSolutions(const std::string& filename);
     static std::map<int, std::vector<std::string>> loadVisualSolutions(const std::string& filename);

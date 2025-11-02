@@ -40,53 +40,53 @@ int PuzzleSolver::inferNeighbours(int row, int col)
     return -1;
 }
 
-int PuzzleSolver::inferWithConfidence(int row, int col)
+int PuzzleSolver::inferStrict(int row, int col)
 {
-    std::map<int, float> colorConfidence;
+    std::map<int, float> colourConfidence;
 
-    int neighborInfer = inferNeighbours(row, col);
-    if (neighborInfer != -1)
+    int neighbourInfer = inferNeighbours(row, col);
+    if (neighbourInfer != -1)
     {
-        colorConfidence[neighborInfer] += 3.0;
+        colourConfidence[neighbourInfer] += 3.0;
     }
 
     int uniformInfer = inferRowColumnUniformity(row, col);
     if (uniformInfer != -1)
     {
-        colorConfidence[uniformInfer] += 2.5;
+        colourConfidence[uniformInfer] += 2.5;
     }
 
     int domainInfer = inferFromDomains(row, col);
     if (domainInfer != -1)
     {
-        colorConfidence[domainInfer] += 2.0;
+        colourConfidence[domainInfer] += 2.0;
     }
 
     int contigInfer = inferFromContiguity(row, col);
     if (contigInfer != -1)
     {
-        colorConfidence[contigInfer] += 2.0;
+        colourConfidence[contigInfer] += 2.0;
     }
 
     int patternInfer = inferPatternCompletion(row, col);
     if (patternInfer != -1)
     {
-        colorConfidence[patternInfer] += 1.5;
+        colourConfidence[patternInfer] += 1.5;
     }
 
-    int bestColor = -1;
+    int bestColour = -1;
     float maxConfidence = 4.5;
 
-    for (auto &[color, confidence] : colorConfidence)
+    for (auto &[color, confidence] : colourConfidence)
     {
         if (confidence > maxConfidence)
         {
             maxConfidence = confidence;
-            bestColor = color;
+            bestColour = color;
         }
     }
 
-    return bestColor;
+    return bestColour;
 }
 
 int PuzzleSolver::inferPatternCompletion(int row, int col)
@@ -110,50 +110,50 @@ int PuzzleSolver::inferRowColumnUniformity(int row, int col)
 {
     int n = puzzle.getOriginal().size();
 
-    std::map<int, int> rowColors;
+    std::map<int, int> rowColours;
     int unknownCountRow = 0;
     for (int c = 0; c < n; c++)
     {
-        int color = puzzle.getMasked()[row][c];
-        if (color == -1)
+        int colour = puzzle.getMasked()[row][c];
+        if (colour == -1)
             unknownCountRow++;
         else
-            rowColors[color]++;
+            rowColours[colour]++;
     }
 
-    if (rowColors.size() == 1 && unknownCountRow > 0)
+    if (rowColours.size() == 1 && unknownCountRow > 0)
     {
-        int dominantColor = rowColors.begin()->first;
-        if (rowColors[dominantColor] >= n / 2)
+        int dominantColour = rowColours.begin()->first;
+        if (rowColours[dominantColour] >= n / 2)
         {
-            return dominantColor;
+            return dominantColour;
         }
     }
 
-    std::map<int, int> colColors;
+    std::map<int, int> colColours;
     int unknownCountCol = 0;
     for (int r = 0; r < n; r++)
     {
-        int color = puzzle.getMasked()[r][col];
-        if (color == -1)
+        int colour = puzzle.getMasked()[r][col];
+        if (colour == -1)
             unknownCountCol++;
         else
-            colColors[color]++;
+            colColours[colour]++;
     }
 
-    if (colColors.size() == 1 && unknownCountCol > 0)
+    if (colColours.size() == 1 && unknownCountCol > 0)
     {
-        int dominantColor = colColors.begin()->first;
-        if (colColors[dominantColor] >= n / 2)
+        int dominantColour = colColours.begin()->first;
+        if (colColours[dominantColour] >= n / 2)
         {
-            return dominantColor;
+            return dominantColour;
         }
     }
 
     return -1;
 }
 
-void PuzzleSolver::computeColorDomains(std::map<int, ColorDomain> &domains)
+void PuzzleSolver::computeColourDomains(std::map<int, ColourDomain> &domains)
 {
     int n = puzzle.getOriginal().size();
 
@@ -161,13 +161,13 @@ void PuzzleSolver::computeColorDomains(std::map<int, ColorDomain> &domains)
     {
         for (int col = 0; col < n; col++)
         {
-            int color = puzzle.getMasked()[row][col];
-            if (color != -1)
+            int colour = puzzle.getMasked()[row][col];
+            if (colour != -1)
             {
-                domains[color].minRow = std::min(domains[color].minRow, row);
-                domains[color].maxRow = std::max(domains[color].maxRow, row);
-                domains[color].minCol = std::min(domains[color].minCol, col);
-                domains[color].maxCol = std::max(domains[color].maxCol, col);
+                domains[colour].minRow = std::min(domains[colour].minRow, row);
+                domains[colour].maxRow = std::max(domains[colour].maxRow, row);
+                domains[colour].minCol = std::min(domains[colour].minCol, col);
+                domains[colour].maxCol = std::max(domains[colour].maxCol, col);
             }
         }
     }
@@ -175,21 +175,21 @@ void PuzzleSolver::computeColorDomains(std::map<int, ColorDomain> &domains)
 
 int PuzzleSolver::inferFromDomains(int row, int col)
 {
-    std::map<int, ColorDomain> domains;
-    computeColorDomains(domains);
+    std::map<int, ColourDomain> domains;
+    computeColourDomains(domains);
 
-    std::vector<int> possibleColors;
-    for (auto &[color, domain] : domains)
+    std::vector<int> possibleColours;
+    for (auto &[colour, domain] : domains)
     {
         if (domain.contains(row, col))
         {
-            possibleColors.push_back(color);
+            possibleColours.push_back(colour);
         }
     }
 
-    if (possibleColors.size() == 1)
+    if (possibleColours.size() == 1)
     {
-        return possibleColors[0];
+        return possibleColours[0];
     }
 
     return -1;
@@ -199,7 +199,7 @@ int PuzzleSolver::inferFromContiguity(int row, int col)
 {
     int n = puzzle.getOriginal().size();
 
-    std::map<int, std::vector<std::pair<int, int>>> colorRegions;
+    std::map<int, std::vector<std::pair<int, int>>> colourRegions;
 
     for (int i = 0; i < 4; i++)
     {
@@ -208,15 +208,15 @@ int PuzzleSolver::inferFromContiguity(int row, int col)
 
         if (nr >= 0 && nr < n && nc >= 0 && nc < n)
         {
-            int color = puzzle.getMasked()[nr][nc];
-            if (color != -1)
+            int colour = puzzle.getMasked()[nr][nc];
+            if (colour != -1)
             {
-                colorRegions[color].push_back({nr, nc});
+                colourRegions[colour].push_back({nr, nc});
             }
         }
     }
 
-    for (auto &[color, cells] : colorRegions)
+    for (auto &[colour, cells] : colourRegions)
     {
         if (cells.size() >= 2)
         {
@@ -237,7 +237,7 @@ int PuzzleSolver::inferFromContiguity(int row, int col)
 
             if (disconnected)
             {
-                return color;
+                return colour;
             }
         }
     }
@@ -245,7 +245,7 @@ int PuzzleSolver::inferFromContiguity(int row, int col)
     return -1;
 }
 
-int PuzzleSolver::countUnknownNeighbors(int row, int col, int n)
+int PuzzleSolver::countUnknownNeighbours(int row, int col, int n)
 {
     int unknownCount = 0;
     for (int i = 0; i < 4; i++)
@@ -268,15 +268,15 @@ double PuzzleSolver::calculateProbeValue(int row, int col, int n)
 {
     double value = 0.0;
 
-    int unknownNeighbors = countUnknownNeighbors(row, col, n);
-    value += unknownNeighbors * 2.0;
+    int unknownNeighbours = countUnknownNeighbours(row, col, n);
+    value += unknownNeighbours * 2.0;
 
     if ((row == 0 || row == n-1) && (col == 0 || col == n-1))
         value += 1.5;
     else if (row == 0 || row == n-1 || col == 0 || col == n-1)
         value += 1.0;
 
-    std::set<int> neighborColors;
+    std::set<int> neighbourColours;
     for (int i = 0; i < 4; i++)
     {
         int newRow = row + directions[i][0];
@@ -284,15 +284,15 @@ double PuzzleSolver::calculateProbeValue(int row, int col, int n)
 
         if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n)
         {
-            int color = puzzle.getMasked()[newRow][newCol];
-            if (color != -1)
+            int colour = puzzle.getMasked()[newRow][newCol];
+            if (colour != -1)
             {
-                neighborColors.insert(color);
+                neighbourColours.insert(colour);
             }
         }
     }
-    if (neighborColors.size() >= 2)
-        value += neighborColors.size() * 1.5;
+    if (neighbourColours.size() >= 2)
+        value += neighbourColours.size() * 1.5;
 
     bool rowHasQueen = false;
     for (int c = 0; c < n; c++)
@@ -326,10 +326,10 @@ void PuzzleSolver::performInferenceCascade(int n)
             {
                 if (puzzle.getMasked()[row][col] == -1)
                 {
-                    int inferredColor = inferWithConfidence(row, col);
-                    if (inferredColor != -1)
+                    int inferredColour = inferStrict(row, col);
+                    if (inferredColour != -1)
                     {
-                        puzzle.getMasked()[row][col] = inferredColor;
+                        puzzle.getMasked()[row][col] = inferredColour;
                         inferredCount++;
                         madeProgress = true;
                     }
@@ -339,7 +339,7 @@ void PuzzleSolver::performInferenceCascade(int n)
     }
 }
 
-bool PuzzleSolver::hasQueenInColor(int color)
+bool PuzzleSolver::hasQueenInColour(int color)
 {
     int n = puzzle.getOriginal().size();
     for (int row = 0; row < n; row++)
@@ -348,8 +348,8 @@ bool PuzzleSolver::hasQueenInColor(int color)
         {
             if (puzzle.getCurrentState()[row][col] == 0)
             {
-                int queenColor = puzzle.getMasked()[row][col];
-                if (queenColor == color)
+                int queenColour = puzzle.getMasked()[row][col];
+                if (queenColour == color)
                 {
                     return true;
                 }
@@ -372,14 +372,14 @@ bool PuzzleSolver::validateFinalSolution(std::vector<std::pair<int, int>>& queen
     for (size_t i = 0; i < queenPositions.size(); i++) {
         int r1 = queenPositions[i].first;
         int c1 = queenPositions[i].second;
-        int color1 = puzzle.getMasked()[r1][c1];
+        int colour1 = puzzle.getMasked()[r1][c1];
 
         for (size_t j = i + 1; j < queenPositions.size(); j++) {
             int r2 = queenPositions[j].first;
             int c2 = queenPositions[j].second;
-            int color2 = puzzle.getMasked()[r2][c2];
+            int colour2 = puzzle.getMasked()[r2][c2];
 
-            if (color1 == color2) {
+            if (colour1 == colour2) {
                 return false;
             }
         }
@@ -429,8 +429,8 @@ bool PuzzleSolver::isValid(int row, int col)
         {
             if (puzzle.getCurrentState()[i][j] == 0)
             {
-                int queenColor = puzzle.getMasked()[i][j];
-                if (queenColor != -1 && queenColor == currentColour)
+                int queenColour = puzzle.getMasked()[i][j];
+                if (queenColour != -1 && queenColour == currentColour)
                 {
                     return false;
                 }
@@ -513,20 +513,20 @@ std::vector<std::pair<int, int>> PuzzleSolver::findViableQueenPositions(int row,
 
         // Infer or verify cell color
         if (basicConstraintsOK) {
-            int cellColor = puzzle.getMasked()[row][col];
+            int cellColour = puzzle.getMasked()[row][col];
 
-            if (cellColor == -1) {
-                int inferredColor = inferWithConfidence(row, col);
-                if (inferredColor != -1) {
-                    puzzle.getMasked()[row][col] = inferredColor;
+            if (cellColour == -1) {
+                int inferredColour = inferStrict(row, col);
+                if (inferredColour != -1) {
+                    puzzle.getMasked()[row][col] = inferredColour;
                     inferredCount++;
-                    cellColor = inferredColor;
+                    cellColour = inferredColour;
                 }
             }
 
             // Check if this color is already used by another queen
-            if (cellColor != -1) {
-                if (hasQueenInColor(cellColor)) {
+            if (cellColour != -1) {
+                if (hasQueenInColour(cellColour)) {
                     basicConstraintsOK = false;
                 }
             }
@@ -569,28 +569,28 @@ double PuzzleSolver::calculateExpectedInformationGain(int row, int col, int n)
 
     gain += 1.0;
 
-    int unknownNeighbors = countUnknownNeighbors(row, col, n);
-    gain += unknownNeighbors * 0.5;
+    int unknownNeighbours = countUnknownNeighbours(row, col, n);
+    gain += unknownNeighbours * 0.5;
 
     gain += calculateProbeValue(row, col, n) * 0.1;
 
-    std::set<int> neighborColors;
+    std::set<int> neighbourColours;
     for (int i = 0; i < 4; i++) {
         int nr = row + directions[i][0];
         int nc = col + directions[i][1];
         if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
-            int color = puzzle.getMasked()[nr][nc];
-            if (color != -1) {
-                neighborColors.insert(color);
+            int colour = puzzle.getMasked()[nr][nc];
+            if (colour != -1) {
+                neighbourColours.insert(colour);
             }
         }
     }
-    gain += neighborColors.size() * 0.3;
+    gain += neighbourColours.size() * 0.3;
 
     return gain;
 }
 
-std::vector<std::pair<int, int>> PuzzleSolver::getMostInformativeProbes(
+std::vector<std::pair<int, int>> PuzzleSolver::findBestProbeSpots(
     int k, std::vector<std::pair<int, int>>& viablePositions)
 {
     int n = puzzle.getOriginal().size();
@@ -671,15 +671,15 @@ bool PuzzleSolver::mainSolver(int row, int n, std::vector<std::pair<int, int>>& 
 
     if (canProbe()) {
         int maxProbesThisRound = std::min(2, (int)viablePositions.size());
-        auto informativeProbes = getMostInformativeProbes(maxProbesThisRound, viablePositions);
+        auto informativeProbes = findBestProbeSpots(maxProbesThisRound, viablePositions);
 
         for (auto [pr, pc] : informativeProbes) {
             if (!canProbe()) break;
 
             if (puzzle.getMasked()[pr][pc] == -1) {
-                int inferredColor = inferWithConfidence(pr, pc);
-                if (inferredColor != -1) {
-                    puzzle.getMasked()[pr][pc] = inferredColor;
+                int inferredColour = inferStrict(pr, pc);
+                if (inferredColour != -1) {
+                    puzzle.getMasked()[pr][pc] = inferredColour;
                     inferredCount++;
                 } else {
                     probe(pr, pc);
@@ -704,8 +704,8 @@ bool PuzzleSolver::mainSolver(int row, int n, std::vector<std::pair<int, int>>& 
         if (puzzle.getMasked()[row][col] != -1) {
             score = 1000.0;
         } else {
-            int inferredColor = inferWithConfidence(row, col);
-            if (inferredColor != -1) {
+            int inferredColour = inferStrict(row, col);
+            if (inferredColour != -1) {
                 score = 500.0;
             } else {
                 score = calculateProbeValue(row, col, n);
@@ -722,33 +722,33 @@ bool PuzzleSolver::mainSolver(int row, int n, std::vector<std::pair<int, int>>& 
         int row = pos.first;
         int col = pos.second;
 
-        int cellColor = puzzle.getMasked()[row][col];
+        int cellColour = puzzle.getMasked()[row][col];
 
-        if (cellColor == -1) {
-            int inferredColor = inferWithConfidence(row, col);
-            if (inferredColor != -1) {
-                puzzle.getMasked()[row][col] = inferredColor;
+        if (cellColour == -1) {
+            int inferredColour = inferStrict(row, col);
+            if (inferredColour != -1) {
+                puzzle.getMasked()[row][col] = inferredColour;
                 inferredCount++;
-                cellColor = inferredColor;
+                cellColour = inferredColour;
             } else if (canProbe()) {
                 probe(row, col);
                 propagateConstraints(n);
-                cellColor = puzzle.getMasked()[row][col];
+                cellColour = puzzle.getMasked()[row][col];
             } else {
                 double confidence = 0.0;
-                int predictedColor = getMostLikelyColor(row, col, confidence);
+                int predictedColour = inferWeak(row, col, confidence);
 
-                if (confidence >= 2.0 && predictedColor != -1) {
-                    cellColor = predictedColor;
+                if (confidence >= 2.0 && predictedColour != -1) {
+                    cellColour = predictedColour;
                 } else {
                     continue;
                 }
             }
         }
 
-        if (cellColor == -1) continue;
+        if (cellColour == -1) continue;
 
-        if (hasQueenInColor(cellColor)) continue;
+        if (hasQueenInColour(cellColour)) continue;
 
         if (isValid(row, col)) {
             puzzle.getCurrentState()[row][col] = 0;
@@ -792,48 +792,48 @@ bool PuzzleSolver::canProbe()
     return true;
 }
 
-int PuzzleSolver::getMostLikelyColor(int row, int col, double& confidence)
+int PuzzleSolver::inferWeak(int row, int col, double& confidence)
 {
-    std::map<int, float> colorConfidence;
+    std::map<int, float> colourConfidence;
     int n = puzzle.getSize();
 
-    int neighborInfer = inferNeighbours(row, col);
-    if (neighborInfer != -1) {
-        colorConfidence[neighborInfer] += 2.0;
+    int neighbourInfer = inferNeighbours(row, col);
+    if (neighbourInfer != -1) {
+        colourConfidence[neighbourInfer] += 2.0;
     }
 
     int rowColInfer = inferRowColumnUniformity(row, col);
     if (rowColInfer != -1) {
-        colorConfidence[rowColInfer] += 1.5;
+        colourConfidence[rowColInfer] += 1.5;
     }
 
     int domainInfer = inferFromDomains(row, col);
     if (domainInfer != -1) {
-        colorConfidence[domainInfer] += 1.0;
+        colourConfidence[domainInfer] += 1.0;
     }
 
     int contiguityInfer = inferFromContiguity(row, col);
     if (contiguityInfer != -1) {
-        colorConfidence[contiguityInfer] += 1.5;
+        colourConfidence[contiguityInfer] += 1.5;
     }
 
     int patternInfer = inferPatternCompletion(row, col);
     if (patternInfer != -1) {
-        colorConfidence[patternInfer] += 1.5;
+        colourConfidence[patternInfer] += 1.5;
     }
 
-    int bestColor = -1;
+    int bestColour = -1;
     float maxConfidence = 0.0;
 
-    for (auto &[color, conf] : colorConfidence) {
+    for (auto &[color, conf] : colourConfidence) {
         if (conf > maxConfidence) {
             maxConfidence = conf;
-            bestColor = color;
+            bestColour = color;
         }
     }
 
     confidence = maxConfidence;
-    return bestColor;
+    return bestColour;
 }
 
 std::map<int, std::vector<std::pair<int, int>>> PuzzleSolver::loadSolutions(const std::string& filename)
