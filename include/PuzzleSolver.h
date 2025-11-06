@@ -12,7 +12,7 @@
 #include <climits>
 #include <map>
 
-struct ColorDomain
+struct ColourDomain
 {
     int minRow = INT_MAX, maxRow = -1;
     int minCol = INT_MAX, maxCol = -1;
@@ -24,35 +24,87 @@ struct ColorDomain
     }
 };
 
+// Structure to collect per-puzzle statistics for experiments
+struct PuzzleStatistics
+{
+    int puzzleNumber = 0;
+    bool solved = false;
+    double correctnessScore = 0.0;  // 0.0 to 1.0
+    int queensPlaced = 0;
+    int expectedQueens = 0;
+    int correctQueens = 0;          // For failed puzzles only
+    int probesUsed = 0;
+    int probeBudget = 0;
+    int inferences = 0;
+    int backtracks = 0;
+    int initialMaskedCells = 0;
+    int cellsRevealed = 0;          // probes + inferences
+    int gridSize = 0;
+};
+
 class PuzzleSolver
 {
 
 private:
     Graph &puzzle;
-    void computeColorDomains(std::map<int, ColorDomain> &domains);
-    int inferWithConfidence(int row, int col);
+    void computeColourDomains(std::map<int, ColourDomain> &domains);
+    int inferStrict(int row, int col);
     int inferFromContiguity(int row, int col);
     int inferFromDomains(int row, int col);
     int inferRowColumnUniformity(int row, int col);
     int inferPatternCompletion(int row, int col);
 
 public:
-    static const int directions[4][2]; // Directions for checking diagonals and columns
+    static const int directions[4][2];
 
     int queensPlaced = 0;
     int backtrackCount = 0;
     int probeCount = 0;
     int inferredCount = 0;
+    int totalQueensPlaced = 0;
+
+    int probeBudget = 0;
+    int initialUnknownCells = 0;
+    bool budgetExhausted = false;
+
+    std::vector<std::pair<int, int>> bestPartialSolution;
+    int maxQueensPlaced = 0;
 
     PuzzleSolver(Graph &graph);
 
-    void performFullInference(int n);
     int inferNeighbours(int row, int col);
-    void processColours();
     void probe(int row, int col);
     bool isValid(int row, int col);
-    bool solvePuzzle(int start, int size);
+    std::vector<std::pair<int, int>> findViableQueenPositions(int row, int n);
+    void undoQueenPlacement(int row, int col);
     void printStatistics();
+
+    double calculateProbeValue(int row, int col, int n);
+    void performInferenceCascade(int n);
+    int countUnknownNeighbours(int row, int col, int n);
+    bool hasQueenInColour(int colour);
+    bool validateFinalSolution(std::vector<std::pair<int, int>>& queenPositions);
+    void restoreBestPartialSolution();
+
+    bool solvePuzzle(int n);
+    bool solvePuzzle(int n, double probeBudgetPercent);
+    bool mainSolver(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
+    std::vector<std::pair<int, int>> findBestProbeSpots(int k, std::vector<std::pair<int, int>>& viablePositions);
+    double calculateExpectedInformationGain(int row, int col, int n);
+    void propagateConstraints(int n);
+
+    void setProbeBudget(int n, double budgetPercent = 0.15);
+    bool canProbe();
+    int inferWeak(int row, int col, double& confidence);
+
+    static std::map<int, std::vector<std::pair<int, int>>> loadSolutions(const std::string& filename);
+    static std::map<int, std::vector<std::string>> loadVisualSolutions(const std::string& filename);
+    double compareToCorrectPositions(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
+    void printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
+
+    // Collect statistics for experiments
+    PuzzleStatistics collectStatistics(int puzzleNumber, bool solved,
+                                       const std::vector<std::pair<int, int>>& correctPositions);
 };
 
 #endif

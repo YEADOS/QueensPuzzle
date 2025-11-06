@@ -1,0 +1,1246 @@
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:37:33 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 15.0%
+Probe Budget Percentage: 30.0%
+Configuration: Masking: 15%, Probe Budget: 30%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  52 / 100
+Puzzles Failed:                  48 / 100
+Success Rate:                    52.00%
+
+Average Correctness (All):       23.90%
+Average Correctness (Solved):    36.54%
+Average Correctness (Failed):    10.21%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            48
+Correct Queens in Failed:        46 / 423
+Failed Puzzle Correctness:       10.87%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               310 / 314 (budget)
+Average Probes per Puzzle:       3.10
+Probe Budget Utilization:        98.73%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           276
+Average Inferences per Puzzle:   2.76
+Probe-to-Inference Ratio:        1:0.89
+  (For every 1 probe, 0.89 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    1187
+Total Cells Revealed:            586
+  - Via Probes:                  310 (52.90%)
+  - Via Inference:               276 (47.10%)
+Reveal Percentage:               49.37%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                258396
+Average Backtracks per Puzzle:   2583.96
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:38:43 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 15.0%
+Probe Budget Percentage: 50.0%
+Configuration: Masking: 15%, Probe Budget: 50%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  65 / 100
+Puzzles Failed:                  35 / 100
+Success Rate:                    65.00%
+
+Average Correctness (All):       23.87%
+Average Correctness (Solved):    32.31%
+Average Correctness (Failed):    8.19%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            35
+Correct Queens in Failed:        27 / 303
+Failed Puzzle Correctness:       8.91%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               514 / 525 (budget)
+Average Probes per Puzzle:       5.14
+Probe Budget Utilization:        97.90%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           296
+Average Inferences per Puzzle:   2.96
+Probe-to-Inference Ratio:        1:0.58
+  (For every 1 probe, 0.58 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    1093
+Total Cells Revealed:            810
+  - Via Probes:                  514 (63.46%)
+  - Via Inference:               296 (36.54%)
+Reveal Percentage:               74.11%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                363318
+Average Backtracks per Puzzle:   3633.18
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:39:24 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 15.0%
+Probe Budget Percentage: 70.0%
+Configuration: Masking: 15%, Probe Budget: 70%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  83 / 100
+Puzzles Failed:                  17 / 100
+Success Rate:                    83.00%
+
+Average Correctness (All):       32.35%
+Average Correctness (Solved):    37.35%
+Average Correctness (Failed):    7.96%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            17
+Correct Queens in Failed:        11 / 149
+Failed Puzzle Correctness:       7.38%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               680 / 740 (budget)
+Average Probes per Puzzle:       6.80
+Probe Budget Utilization:        91.89%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           310
+Average Inferences per Puzzle:   3.10
+Probe-to-Inference Ratio:        1:0.46
+  (For every 1 probe, 0.46 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    1119
+Total Cells Revealed:            990
+  - Via Probes:                  680 (68.69%)
+  - Via Inference:               310 (31.31%)
+Reveal Percentage:               88.47%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                383129
+Average Backtracks per Puzzle:   3831.29
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:42:07 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 30.0%
+Probe Budget Percentage: 30.0%
+Configuration: Masking: 30%, Probe Budget: 30%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  24 / 100
+Puzzles Failed:                  76 / 100
+Success Rate:                    24.00%
+
+Average Correctness (All):       14.25%
+Average Correctness (Solved):    33.15%
+Average Correctness (Failed):    8.28%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            76
+Correct Queens in Failed:        57 / 660
+Failed Puzzle Correctness:       8.64%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               629 / 635 (budget)
+Average Probes per Puzzle:       6.29
+Probe Budget Utilization:        99.06%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           513
+Average Inferences per Puzzle:   5.13
+Probe-to-Inference Ratio:        1:0.82
+  (For every 1 probe, 0.82 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    2262
+Total Cells Revealed:            1142
+  - Via Probes:                  629 (55.08%)
+  - Via Inference:               513 (44.92%)
+Reveal Percentage:               50.49%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                237389
+Average Backtracks per Puzzle:   2373.89
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:43:05 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 30.0%
+Probe Budget Percentage: 50.0%
+Configuration: Masking: 30%, Probe Budget: 50%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  40 / 100
+Puzzles Failed:                  60 / 100
+Success Rate:                    40.00%
+
+Average Correctness (All):       18.96%
+Average Correctness (Solved):    32.50%
+Average Correctness (Failed):    9.94%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            60
+Correct Queens in Failed:        53 / 519
+Failed Puzzle Correctness:       10.21%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1088 / 1111 (budget)
+Average Probes per Puzzle:       10.88
+Probe Budget Utilization:        97.93%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           544
+Average Inferences per Puzzle:   5.44
+Probe-to-Inference Ratio:        1:0.50
+  (For every 1 probe, 0.50 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    2272
+Total Cells Revealed:            1632
+  - Via Probes:                  1088 (66.67%)
+  - Via Inference:               544 (33.33%)
+Reveal Percentage:               71.83%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                269699
+Average Backtracks per Puzzle:   2696.99
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:44:04 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 30.0%
+Probe Budget Percentage: 70.0%
+Configuration: Masking: 30%, Probe Budget: 70%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  57 / 100
+Puzzles Failed:                  43 / 100
+Success Rate:                    57.00%
+
+Average Correctness (All):       24.66%
+Average Correctness (Solved):    36.06%
+Average Correctness (Failed):    9.54%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            43
+Correct Queens in Failed:        37 / 378
+Failed Puzzle Correctness:       9.79%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1439 / 1571 (budget)
+Average Probes per Puzzle:       14.39
+Probe Budget Utilization:        91.60%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           612
+Average Inferences per Puzzle:   6.12
+Probe-to-Inference Ratio:        1:0.43
+  (For every 1 probe, 0.43 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    2308
+Total Cells Revealed:            2051
+  - Via Probes:                  1439 (70.16%)
+  - Via Inference:               612 (29.84%)
+Reveal Percentage:               88.86%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                362933
+Average Backtracks per Puzzle:   3629.33
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:45:40 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 50.0%
+Probe Budget Percentage: 30.0%
+Configuration: Masking: 50%, Probe Budget: 30%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  4 / 100
+Puzzles Failed:                  96 / 100
+Success Rate:                    4.00%
+
+Average Correctness (All):       8.60%
+Average Correctness (Solved):    50.00%
+Average Correctness (Failed):    6.87%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            96
+Correct Queens in Failed:        58 / 832
+Failed Puzzle Correctness:       6.97%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1076 / 1098 (budget)
+Average Probes per Puzzle:       10.76
+Probe Budget Utilization:        98.00%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           751
+Average Inferences per Puzzle:   7.51
+Probe-to-Inference Ratio:        1:0.70
+  (For every 1 probe, 0.70 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    3811
+Total Cells Revealed:            1827
+  - Via Probes:                  1076 (58.89%)
+  - Via Inference:               751 (41.11%)
+Reveal Percentage:               47.94%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                96901
+Average Backtracks per Puzzle:   969.01
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:47:02 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 50.0%
+Probe Budget Percentage: 50.0%
+Configuration: Masking: 50%, Probe Budget: 50%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  16 / 100
+Puzzles Failed:                  84 / 100
+Success Rate:                    16.00%
+
+Average Correctness (All):       9.95%
+Average Correctness (Solved):    27.78%
+Average Correctness (Failed):    6.55%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            84
+Correct Queens in Failed:        50 / 735
+Failed Puzzle Correctness:       6.80%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1825 / 1891 (budget)
+Average Probes per Puzzle:       18.25
+Probe Budget Utilization:        96.51%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           831
+Average Inferences per Puzzle:   8.31
+Probe-to-Inference Ratio:        1:0.46
+  (For every 1 probe, 0.46 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    3827
+Total Cells Revealed:            2656
+  - Via Probes:                  1825 (68.71%)
+  - Via Inference:               831 (31.29%)
+Reveal Percentage:               69.40%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                152707
+Average Backtracks per Puzzle:   1527.07
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:48:03 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 50.0%
+Probe Budget Percentage: 70.0%
+Configuration: Masking: 50%, Probe Budget: 70%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  42 / 100
+Puzzles Failed:                  58 / 100
+Success Rate:                    42.00%
+
+Average Correctness (All):       17.83%
+Average Correctness (Solved):    29.76%
+Average Correctness (Failed):    9.20%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            58
+Correct Queens in Failed:        48 / 510
+Failed Puzzle Correctness:       9.41%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               2397 / 2613 (budget)
+Average Probes per Puzzle:       23.97
+Probe Budget Utilization:        91.73%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           899
+Average Inferences per Puzzle:   8.99
+Probe-to-Inference Ratio:        1:0.38
+  (For every 1 probe, 0.38 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    3799
+Total Cells Revealed:            3296
+  - Via Probes:                  2397 (72.72%)
+  - Via Inference:               899 (27.28%)
+Reveal Percentage:               86.76%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                295501
+Average Backtracks per Puzzle:   2955.01
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:48:22 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 70.0%
+Probe Budget Percentage: 30.0%
+Configuration: Masking: 70%, Probe Budget: 30%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  0 / 100
+Puzzles Failed:                  100 / 100
+Success Rate:                    0.00%
+
+Average Correctness (All):       5.01%
+Average Correctness (Solved):    0.00%
+Average Correctness (Failed):    5.01%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            100
+Correct Queens in Failed:        45 / 867
+Failed Puzzle Correctness:       5.19%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1526 / 1555 (budget)
+Average Probes per Puzzle:       15.26
+Probe Budget Utilization:        98.14%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           816
+Average Inferences per Puzzle:   8.16
+Probe-to-Inference Ratio:        1:0.53
+  (For every 1 probe, 0.53 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    5341
+Total Cells Revealed:            2342
+  - Via Probes:                  1526 (65.16%)
+  - Via Inference:               816 (34.84%)
+Reveal Percentage:               43.85%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                17654
+Average Backtracks per Puzzle:   176.54
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:49:21 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 70.0%
+Probe Budget Percentage: 50.0%
+Configuration: Masking: 70%, Probe Budget: 50%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  3 / 100
+Puzzles Failed:                  97 / 100
+Success Rate:                    3.00%
+
+Average Correctness (All):       9.90%
+Average Correctness (Solved):    85.19%
+Average Correctness (Failed):    7.57%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            97
+Correct Queens in Failed:        67 / 843
+Failed Puzzle Correctness:       7.95%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               2511 / 2619 (budget)
+Average Probes per Puzzle:       25.11
+Probe Budget Utilization:        95.88%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           945
+Average Inferences per Puzzle:   9.45
+Probe-to-Inference Ratio:        1:0.38
+  (For every 1 probe, 0.38 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    5287
+Total Cells Revealed:            3456
+  - Via Probes:                  2511 (72.66%)
+  - Via Inference:               945 (27.34%)
+Reveal Percentage:               65.37%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                74673
+Average Backtracks per Puzzle:   746.73
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:50:15 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 100
+Masking Percentage: 70.0%
+Probe Budget Percentage: 70.0%
+Configuration: Masking: 70%, Probe Budget: 70%
+Total Puzzles Tested: 100
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  26 / 100
+Puzzles Failed:                  74 / 100
+Success Rate:                    26.00%
+
+Average Correctness (All):       14.18%
+Average Correctness (Solved):    27.47%
+Average Correctness (Failed):    9.51%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            74
+Correct Queens in Failed:        63 / 651
+Failed Puzzle Correctness:       9.68%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               3310 / 3678 (budget)
+Average Probes per Puzzle:       33.10
+Probe Budget Utilization:        89.99%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           1183
+Average Inferences per Puzzle:   11.83
+Probe-to-Inference Ratio:        1:0.36
+  (For every 1 probe, 0.36 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    5324
+Total Cells Revealed:            4493
+  - Via Probes:                  3310 (73.67%)
+  - Via Inference:               1183 (26.33%)
+Reveal Percentage:               84.39%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                253068
+Average Backtracks per Puzzle:   2530.68
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.67 x 8.67
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:50:38 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 50
+Masking Percentage: 90.0%
+Probe Budget Percentage: 50.0%
+Configuration: Masking: 90%, Probe Budget: 50%
+Total Puzzles Tested: 50
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  0 / 50
+Puzzles Failed:                  50 / 50
+Success Rate:                    0.00%
+
+Average Correctness (All):       15.30%
+Average Correctness (Solved):    0.00%
+Average Correctness (Failed):    15.30%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            50
+Correct Queens in Failed:        70 / 447
+Failed Puzzle Correctness:       15.66%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               1682 / 1811 (budget)
+Average Probes per Puzzle:       33.64
+Probe Budget Utilization:        92.88%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           526
+Average Inferences per Puzzle:   10.52
+Probe-to-Inference Ratio:        1:0.31
+  (For every 1 probe, 0.31 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    3647
+Total Cells Revealed:            2208
+  - Via Probes:                  1682 (76.18%)
+  - Via Inference:               526 (23.82%)
+Reveal Percentage:               60.54%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                13378
+Average Backtracks per Puzzle:   267.56
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.94 x 8.94
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================
+
+
+################################################################################
+################################################################################
+##                                                                            ##
+##                     NEW EXPERIMENT RUN                                     ##
+##                                                                            ##
+################################################################################
+################################################################################
+
+================================================================================
+                    PUZZLE SOLVER EXPERIMENT RESULTS                            
+================================================================================
+
+Experiment Date: Thu Nov  6 16:51:45 2025
+
+[ TEST CONFIGURATION ]
+Number of Puzzles: 50
+Masking Percentage: 30.0%
+Probe Budget Percentage: 10.0%
+Configuration: Masking: 30%, Probe Budget: 10%
+Total Puzzles Tested: 50
+
+--------------------------------------------------------------------------------
+                         SUCCESS METRICS                                        
+--------------------------------------------------------------------------------
+
+Puzzles Solved:                  5 / 50
+Puzzles Failed:                  45 / 50
+Success Rate:                    10.00%
+
+Average Correctness (All):       18.92%
+Average Correctness (Solved):    60.00%
+Average Correctness (Failed):    14.36%
+
+--------------------------------------------------------------------------------
+                    FAILED PUZZLE ANALYSIS                                      
+--------------------------------------------------------------------------------
+
+Total Failed Puzzles:            45
+Correct Queens in Failed:        57 / 404
+Failed Puzzle Correctness:       14.11%
+  (Percentage of correctly placed queens across all failed puzzles)
+
+--------------------------------------------------------------------------------
+                      PROBE EFFICIENCY METRICS                                  
+--------------------------------------------------------------------------------
+
+Total Probes Used:               95 / 97 (budget)
+Average Probes per Puzzle:       1.90
+Probe Budget Utilization:        97.94%
+  (Percentage of allocated probe budget actually used)
+
+--------------------------------------------------------------------------------
+                    INFERENCE & SENSING METRICS                                 
+--------------------------------------------------------------------------------
+
+Total Inferences Made:           276
+Average Inferences per Puzzle:   5.52
+Probe-to-Inference Ratio:        1:2.91
+  (For every 1 probe, 2.91 cells were inferred)
+
+--------------------------------------------------------------------------------
+                     INFORMATION REVEALING METRICS                              
+--------------------------------------------------------------------------------
+
+Total Initially Masked Cells:    1196
+Total Cells Revealed:            371
+  - Via Probes:                  95 (25.61%)
+  - Via Inference:               276 (74.39%)
+Reveal Percentage:               31.02%
+  (Percentage of masked cells that were revealed)
+
+--------------------------------------------------------------------------------
+                      BACKTRACKING METRICS                                      
+--------------------------------------------------------------------------------
+
+Total Backtracks:                64333
+Average Backtracks per Puzzle:   1286.66
+
+--------------------------------------------------------------------------------
+                         GENERAL INFORMATION                                    
+--------------------------------------------------------------------------------
+
+Average Grid Size:               8.94 x 8.94
+
+================================================================================
+                              END OF REPORT                                     
+================================================================================

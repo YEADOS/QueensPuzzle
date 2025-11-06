@@ -9,6 +9,7 @@
 #include <random>
 #include <iostream>
 
+// Key: {Queen = 0, Masked = -1, Colour Square = 1 to N-Colours}
 
 class Graph {
 
@@ -27,11 +28,13 @@ class Graph {
 
         std::vector<std::vector<int>> createMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob);
         std::vector<std::vector<int>> createMaskedMatrix(std::string filename);
+        std::vector<std::vector<int>> createSmartMaskedMatrix(const std::vector<std::vector<int>>& original, double mask_prob);
         
     public: 
 
         Graph();
         Graph(const std::vector<std::vector<int>>& data);
+        Graph(const std::vector<std::vector<int>>& data, double maskingPercentage);
 
         // const void printGraph();    
         void printGraph(PrintMode mode = ORIGINAL) const;
