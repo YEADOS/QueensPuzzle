@@ -43,9 +43,13 @@ Graph::Graph() {
     // puzzleBackup = puzzle;
 }
 
-// Constructor
+// Constructor (default 30% masking)
 Graph::Graph(const std::vector<std::vector<int>>& data)
     : original(data), currentState(data), masked(createMaskedMatrix(data, 0.3)) {}
+
+// Constructor with configurable masking percentage
+Graph::Graph(const std::vector<std::vector<int>>& data, double maskingPercentage)
+    : original(data), currentState(data), masked(createMaskedMatrix(data, maskingPercentage)) {}
 
 const std::vector<std::vector<int>>& Graph::getOriginal() {
     return original;

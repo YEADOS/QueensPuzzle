@@ -24,6 +24,24 @@ struct ColourDomain
     }
 };
 
+// Structure to collect per-puzzle statistics for experiments
+struct PuzzleStatistics
+{
+    int puzzleNumber = 0;
+    bool solved = false;
+    double correctnessScore = 0.0;  // 0.0 to 1.0
+    int queensPlaced = 0;
+    int expectedQueens = 0;
+    int correctQueens = 0;          // For failed puzzles only
+    int probesUsed = 0;
+    int probeBudget = 0;
+    int inferences = 0;
+    int backtracks = 0;
+    int initialMaskedCells = 0;
+    int cellsRevealed = 0;          // probes + inferences
+    int gridSize = 0;
+};
+
 class PuzzleSolver
 {
 
@@ -69,6 +87,7 @@ public:
     void restoreBestPartialSolution();
 
     bool solvePuzzle(int n);
+    bool solvePuzzle(int n, double probeBudgetPercent);
     bool mainSolver(int row, int n, std::vector<std::pair<int, int>>& queenPositions);
     std::vector<std::pair<int, int>> findBestProbeSpots(int k, std::vector<std::pair<int, int>>& viablePositions);
     double calculateExpectedInformationGain(int row, int col, int n);
@@ -82,6 +101,10 @@ public:
     static std::map<int, std::vector<std::string>> loadVisualSolutions(const std::string& filename);
     double compareToCorrectPositions(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
     void printCorrectnessReport(int puzzleNumber, const std::vector<std::pair<int, int>>& groundTruth);
+
+    // Collect statistics for experiments
+    PuzzleStatistics collectStatistics(int puzzleNumber, bool solved,
+                                       const std::vector<std::pair<int, int>>& correctPositions);
 };
 
 #endif

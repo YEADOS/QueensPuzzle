@@ -4,14 +4,34 @@
 
 // Key: {Queen = 0, Masked = -1, Colour Square = 1 to N-Colours}
 
-int main()
+int main(int argc, char* argv[])
 {
-
-    int numPuzzles = 2;
+    // Configuration parameters (can be passed as command line args)
+    int numPuzzles = 100;
+    double maskingPercentage = 0.3;      // 30% by default
+    double probeBudgetPercent = 0.5;     // 50% by default
     std::string puzzleFileName = "puzzles.txt";
+
+    // Allow command line arguments for customization
+    // Usage: ./main.out [numPuzzles] [maskingPercent] [probeBudgetPercent]
+    if (argc >= 2) {
+        numPuzzles = std::stoi(argv[1]);
+    }
+    if (argc >= 3) {
+        maskingPercentage = std::stod(argv[2]);
+    }
+    if (argc >= 4) {
+        probeBudgetPercent = std::stod(argv[3]);
+    }
+
+    std::cout << "\n[ CONFIGURATION ]\n";
+    std::cout << "Number of puzzles: " << numPuzzles << "\n";
+    std::cout << "Masking percentage: " << (maskingPercentage * 100) << "%\n";
+    std::cout << "Probe budget: " << (probeBudgetPercent * 100) << "% of masked cells\n\n";
+
     std::vector<Graph> graphs;
     // std::vector<Graph> Graphs; = PuzzleManager::loadFromFile(puzzleFileName, numPuzzles);
-    PuzzleManager::loadFromFile(puzzleFileName, numPuzzles, graphs);
+    PuzzleManager::loadFromFile(puzzleFileName, numPuzzles, graphs, maskingPercentage);
 
     // Load solutions to verify PuzzleSolver results 
     auto solutionsPos = PuzzleSolver::loadSolutions("solutions.txt");
@@ -37,7 +57,7 @@ int main()
         std::cout << "Original:\n";
         g.printGraph(g.ORIGINAL);
 
-        bool solved = solver.solvePuzzle(g.getSize());  // Using minimal sensing solver
+        bool solved = solver.solvePuzzle(g.getSize(), probeBudgetPercent);  // Using minimal sensing solver
 
         // when the solver fails
         if (!solved)

@@ -34,6 +34,7 @@ class Graph {
 
         Graph();
         Graph(const std::vector<std::vector<int>>& data);
+        Graph(const std::vector<std::vector<int>>& data, double maskingPercentage);
 
         // const void printGraph();    
         void printGraph(PrintMode mode = ORIGINAL) const;

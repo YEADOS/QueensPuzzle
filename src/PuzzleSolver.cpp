@@ -637,7 +637,24 @@ void PuzzleSolver::propagateConstraints(int n)
 
 bool PuzzleSolver::solvePuzzle(int n)
 {
-    setProbeBudget(n, 0.3);
+    setProbeBudget(n, 0.5);
+
+    bestPartialSolution.clear();
+    maxQueensPlaced = 0;
+
+    std::vector<std::pair<int, int>> queenPositions;
+    bool solved = mainSolver(0, n, queenPositions);
+
+    if (!solved && !bestPartialSolution.empty()) {
+        restoreBestPartialSolution();
+    }
+
+    return solved;
+}
+
+bool PuzzleSolver::solvePuzzle(int n, double probeBudgetPercent)
+{
+    setProbeBudget(n, probeBudgetPercent);
 
     bestPartialSolution.clear();
     maxQueensPlaced = 0;
@@ -1041,4 +1058,45 @@ void PuzzleSolver::printCorrectnessReport(int puzzleNumber, const std::vector<st
     if (correctPercent == 100.0) {
         std::cout << "\nSolver solution is correct\n";
     }
+}
+
+PuzzleStatistics PuzzleSolver::collectStatistics(int puzzleNumber, bool solved,
+                                                  const std::vector<std::pair<int, int>>& correctPositions)
+{
+    PuzzleStatistics stats;
+    stats.puzzleNumber = puzzleNumber;
+    stats.solved = solved;
+    stats.gridSize = puzzle.getSize();
+    stats.queensPlaced = queensPlaced;
+    stats.expectedQueens = puzzle.getSize();
+    stats.probesUsed = probeCount;
+    stats.probeBudget = probeBudget;
+    stats.inferences = inferredCount;
+    stats.backtracks = backtrackCount;
+    stats.initialMaskedCells = initialUnknownCells;
+    stats.cellsRevealed = probeCount + inferredCount;
+
+    // Calculate correctness score
+    if (!correctPositions.empty()) {
+        stats.correctnessScore = compareToCorrectPositions(puzzleNumber, correctPositions);
+
+        // For failed puzzles, count correct queens placed
+        if (!solved) {
+            int n = puzzle.getSize();
+            std::set<std::pair<int, int>> correctPositionsSet(correctPositions.begin(), correctPositions.end());
+
+            stats.correctQueens = 0;
+            for (int row = 0; row < n; row++) {
+                for (int col = 0; col < n; col++) {
+                    if (puzzle.getCurrentState()[row][col] == 0) {
+                        if (correctPositionsSet.find({row, col}) != correctPositionsSet.end()) {
+                            stats.correctQueens++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return stats;
 }
